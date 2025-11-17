@@ -1,11 +1,32 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import logo from "/Logo.png";
 import MyLink from "./MyLink";
 
 import Container from "./Container";
+import { toast } from "react-toastify";
+import { use } from "react";
+import { AuthContext } from "../Context/authContext";
 
 const Navbar = () => {
-  const handleSignout = () => {};
+  const navigate = useNavigate();
+
+  const { user, signoutUserFunc, setUser, loading, setLoading } =
+    use(AuthContext);
+  console.log(user);
+
+  const handleSignout = () => {
+    signoutUserFunc()
+      .then(() => {
+        toast.success("Signout successful");
+
+        navigate("/signin");
+      })
+      .catch((e) => {
+        toast.error(e.message);
+      });
+  };
+
+  console.log(loading);
 
   return (
     <div className="bg-green-500 py-2 border-b border-b-slate-300 ">
