@@ -7,7 +7,7 @@ import { AuthContext } from "../Context/AuthContext";
 import Container from "../Components/Container";
 import { FcGoogle } from "react-icons/fc";
 
-const Signin = () => {
+const Login = () => {
   const [show, setShow] = useState(false);
   const {
     signInWithEmailAndPasswordFunc,
@@ -174,7 +174,7 @@ const Signin = () => {
               <p className="text-sm text-gray-500">
                 Don’t have an account?{" "}
                 <Link
-                  to="/signup"
+                  to="/register"
                   className="text-green-600 hover:underline font-medium"
                 >
                   Register Here
@@ -188,4 +188,4 @@ const Signin = () => {
   );
 };
 
-export default Signin;
+export default Login;

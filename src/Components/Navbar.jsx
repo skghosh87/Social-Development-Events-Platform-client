@@ -20,7 +20,7 @@ const Navbar = () => {
     signoutUserFunc()
       .then(() => {
         toast.success("Signout successful");
-        navigate("/signin");
+        navigate("/login");
       })
       .catch((e) => {
         // ফায়ারবেস এরর হ্যান্ডলিং যোগ করা যেতে পারে, তবে আপাতত শুধু মেসেজ দেখাচ্ছে
@@ -92,7 +92,7 @@ const Navbar = () => {
 
   // লগআউট করা ইউজারের জন্য সাইন-ইন বাটন
   const SignInButton = (
-    <Link to={"/signin"}>
+    <Link to={"/login"}>
       <button className="bg-purple-600 text-white px-4 py-2 rounded-md font-semibold cursor-pointer hover:bg-purple-700 transition duration-300 shadow-md">
         Login
       </button>

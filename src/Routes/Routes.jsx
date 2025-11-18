@@ -8,7 +8,7 @@ import PrivateRoute from "../PrivateRoute/PrivateRoute";
 import CreateEvent from "../Pages/CreateEvent";
 import ManageEvents from "../Pages/ManageEvents";
 import JoinedEvents from "../Pages/JoinedEvents";
-import Signin from "../Pages/Signin";
+import Login from "../Pages/Login";
 
 export const router = createBrowserRouter([
   {
@@ -25,11 +25,11 @@ export const router = createBrowserRouter([
         element: <UpcomingEvents />,
       },
       {
-        path: "/signin",
-        element: <Signin />,
+        path: "/login",
+        element: <Login />,
       },
       {
-        path: "/signup",
+        path: "/register",
         element: <Register />,
       },
 
