@@ -1,139 +1,189 @@
-import React, { useState } from "react";
+import React, { useContext, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useAuth } from "../Context/authContext";
+import { FaEye, FaGoogle, FaSignInAlt } from "react-icons/fa";
+import { IoEyeOff } from "react-icons/io5";
 import { toast } from "react-toastify";
+import { AuthContext } from "../Context/AuthContext";
+import Container from "../Components/Container";
+import { FcGoogle } from "react-icons/fc";
 
 const Signin = () => {
-  const { signIn, signInWithGoogle } = useAuth();
+  const [show, setShow] = useState(false);
+  const {
+    signInWithEmailAndPasswordFunc,
+    signInWithEmailFunc,
+    sendPassResetEmailFunc,
+    setLoading,
+    user,
+  } = useContext(AuthContext);
 
-  const [error, setError] = useState("");
-  const navigate = useNavigate();
   const location = useLocation();
 
-  const from = location.state?.from?.pathname || "/";
+  const from = location.state?.from || "/";
+  const navigate = useNavigate();
 
-  const handleLogin = async (e) => {
+  if (user) {
+    navigate("/");
+    return;
+  }
+
+  const emailRef = useRef(null);
+
+  const handleSignin = (e) => {
     e.preventDefault();
-    setError("");
+    const email = e.target.email?.value;
+    const password = e.target.password?.value;
+    setLoading(true);
 
-    const form = new FormData(e.currentTarget);
-    const email = form.get("email");
-    const password = form.get("password");
+    signInWithEmailAndPasswordFunc(email, password)
+      .then(() => {
+        toast.success(
+          "Signin successful! Welcome back to Social Development Platform"
+        );
+        navigate(from);
+      })
+      .catch((e) => {
+        setLoading(false);
 
-    try {
-      await signIn(email, password);
-
-      toast.success("Successfully signed in!");
-
-      navigate(from, { replace: true });
-    } catch (err) {
-      console.error(err);
-
-      const message = err.message
-        .replace("Firebase: Error (auth/", "")
-        .replace(").", "")
-        .replace("-", " ");
-      setError(message);
-      toast.error(message || "Login failed! Please check credentials.");
-    }
+        toast.error(
+          e.message
+            .replace("Firebase: Error (auth/", "")
+            .replace(").", "")
+            .replaceAll("-", " ")
+        );
+      });
   };
 
-  // ২. Google দিয়ে লগইন হ্যান্ডেল
-  const handleGoogleSignIn = async () => {
-    try {
-      await signInWithGoogle();
-      toast.success("Successfully signed in with Google!");
-      navigate(from, { replace: true });
-    } catch (err) {
-      console.error(err);
-      const message = err.message
-        .replace("Firebase: Error (auth/", "")
-        .replace(").", "")
-        .replace("-", " ");
-      setError(message);
-      toast.error(message || "Google sign in failed!");
+  const handleGoogleSignin = () => {
+    setLoading(true);
+    signInWithEmailFunc()
+      .then(() => {
+        toast.success("Google Signin Successful! ");
+        navigate(from);
+      })
+      .catch((e) => {
+        setLoading(false);
+
+        toast.error(
+          e.message
+            .replace("Firebase: Error (auth/", "")
+            .replace(").", "")
+            .replaceAll("-", " ")
+        );
+      });
+  };
+
+  const handleForgetPassword = () => {
+    const email = emailRef.current?.value;
+
+    if (!email) {
+      toast.error("Please enter your email address in the field above.");
+      return;
     }
+
+    sendPassResetEmailFunc(email)
+      .then(() => {
+        toast.success("Check your email to reset password.");
+      })
+      .catch((e) => {
+        setLoading(false);
+
+        toast.error(
+          e.message
+            .replace("Firebase: Error (auth/", "")
+            .replace(").", "")
+            .replaceAll("-", " ")
+        );
+      });
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100 p-4">
-      <div className="w-full max-w-md bg-white rounded-lg shadow-lg p-8">
-        <h2 className="text-3xl font-bold text-center mb-6">Sign In</h2>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+      <Container className="flex items-center justify-center">
+        <div className="w-full max-w-lg bg-white p-8 rounded-xl shadow-2xl border border-green-300">
+          <h2 className="text-3xl font-bold text-center text-green-700 mb-6 flex items-center justify-center gap-2">
+            <FaSignInAlt className="text-green-500" /> Welcome Back!
+          </h2>
+          <form onSubmit={handleSignin} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Email
+              </label>
+              <input
+                type="email"
+                name="email"
+                ref={emailRef}
+                placeholder="example@email.com"
+                className="mt-1 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 transition duration-150"
+                required
+              />
+            </div>
 
-        <form onSubmit={handleLogin} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Email
-            </label>
-            <input
-              type="email"
-              name="email"
-              required
-              className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Password
-            </label>
-            <input
-              type="password"
-              name="password"
-              required
-              className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-            />
-          </div>
+            <div className="relative">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Password
+              </label>
+              <input
+                type={show ? "text" : "password"}
+                name="password"
+                placeholder="••••••••"
+                className="mt-1 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 transition duration-150"
+                required
+              />
+              <span
+                onClick={() => setShow(!show)}
+                className="absolute right-3 top-1/2 mt-2 cursor-pointer text-green-600 text-lg"
+              >
+                {show ? <IoEyeOff /> : <FaEye />}
+              </span>
+            </div>
 
-          <button
-            type="submit"
-            className="w-full bg-green-600 text-white p-3 rounded-md font-semibold hover:bg-green-700 transition"
-          >
-            Sign In
-          </button>
-        </form>
+            <button
+              className="text-sm font-medium text-green-600 hover:text-green-800 hover:underline cursor-pointer block text-left"
+              onClick={handleForgetPassword}
+              type="button"
+            >
+              Forgot Password?
+            </button>
 
-        <div className="divider my-6 text-gray-500">OR</div>
+            <button
+              type="submit"
+              className="w-full py-3 px-4 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition duration-300 shadow-md"
+            >
+              Sign In
+            </button>
 
-        <button
-          onClick={handleGoogleSignIn}
-          className="w-full flex items-center justify-center border border-gray-300 p-3 rounded-md font-semibold hover:bg-gray-50 transition"
-        >
-          <svg
-            className="w-5 h-5 mr-2"
-            fill="currentColor"
-            viewBox="0 0 24 24"
-            alt="Google logo"
-          >
-            <path
-              d="M12.0001 4.80005C14.7946 4.80005 16.7126 5.95505 17.6521 6.94005L20.4571 4.14505C18.4231 2.22705 15.6551 1.20005 12.0001 1.20005C7.27912 1.20005 3.19712 3.66405 1.25812 7.16405L4.47812 9.61005C5.45412 6.81905 8.42712 4.80005 12.0001 4.80005Z"
-              fill="#EA4335"
-            />
-            <path
-              d="M22.0001 12.1201C22.0001 11.4401 21.9441 10.7491 21.8241 10.0891H12.0001V14.1691H17.5501C17.3001 15.6881 16.3401 16.9691 15.0001 17.8441L18.2911 20.3751C20.3701 18.5141 22.0001 15.4261 22.0001 12.1201Z"
-              fill="#4285F4"
-            />
-            <path
-              d="M15.0001 17.844C13.8051 18.665 12.4341 19.199 12.0001 19.199C9.07212 19.199 6.55012 17.568 5.48512 15.195L2.27512 17.641C4.38112 21.579 8.67512 24.0001 12.0001 24.0001C15.6261 24.0001 18.6731 22.7931 20.7221 20.8441L18.2911 20.3751C17.0601 21.2181 16.0351 21.8441 15.0001 21.8441Z"
-              fill="#FBBC04"
-            />
-            <path
-              d="M5.48512 15.195C5.23412 14.475 5.09912 13.689 5.09912 12.879C5.09912 12.069 5.23412 11.283 5.48512 10.563L2.27512 8.117C1.49612 9.778 1.00012 11.498 1.00012 12.879C1.00012 14.2601 1.49612 15.9801 2.27512 17.6411L5.48512 15.195Z"
-              fill="#34A853"
-            />
-          </svg>
-          Continue with Google
-        </button>
+            <div className="mt-5 border-t border-gray-200 pt-5">
+              <div className="flex items-center justify-center gap-2 mb-4">
+                <div className="h-px w-full bg-gray-200"></div>
+                <span className="text-sm text-gray-500">OR</span>
+                <div className="h-px w-full bg-gray-200"></div>
+              </div>
 
-        <p className="mt-4 text-center text-sm text-gray-600">
-          Don't have an account?{" "}
-          <Link
-            to="/register"
-            className="text-blue-600 font-semibold hover:underline"
-          >
-            Register here
-          </Link>
-        </p>
-      </div>
+              <button
+                onClick={handleGoogleSignin}
+                type="button"
+                className="w-full flex items-center justify-center py-2 px-4 mb-3 border border-gray-300 rounded-lg shadow-sm text-base font-medium text-gray-700 bg-white hover:bg-gray-50 transition duration-150"
+              >
+                <FcGoogle className="mr-3 text-red-500 text-lg" />
+                Sign in with Google
+              </button>
+            </div>
+
+            <div className="text-center mt-3">
+              <p className="text-sm text-gray-500">
+                Don’t have an account?{" "}
+                <Link
+                  to="/signup"
+                  className="text-green-600 hover:underline font-medium"
+                >
+                  Register Here
+                </Link>
+              </p>
+            </div>
+          </form>
+        </div>
+      </Container>
     </div>
   );
 };
