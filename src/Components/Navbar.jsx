@@ -1,21 +1,19 @@
 import { Link, useNavigate } from "react-router-dom";
 import logo from "/Logo.png";
-// MyLink কম্পোনেন্ট আপনার কাস্টম লিংক স্টাইল পরিচালনা করে
+
 import MyLink from "./MyLink";
 import Container from "./Container";
 import { toast } from "react-toastify";
 import { useContext } from "react";
 import { AuthContext } from "../Context/AuthContext";
-// ডিফল্ট ইউজার ইমেজ
+
 const DEFAULT_AVATAR = "https://i.ibb.co/5vFwYxS/default-user.png";
 
 const Navbar = () => {
   const navigate = useNavigate();
 
-  // useContext ব্যবহার করে প্রয়োজনীয় ফাংশন এবং স্টেট নেওয়া হয়েছে
   const { user, signoutUserFunc, loading } = useContext(AuthContext);
 
-  // লগআউট হ্যান্ডলার ফাংশন
   const handleSignout = () => {
     signoutUserFunc()
       .then(() => {
@@ -23,25 +21,21 @@ const Navbar = () => {
         navigate("/login");
       })
       .catch((e) => {
-        // ফায়ারবেস এরর হ্যান্ডলিং যোগ করা যেতে পারে, তবে আপাতত শুধু মেসেজ দেখাচ্ছে
         toast.error(e.message);
       });
   };
 
-  // লোডিং অবস্থায় কিছু রেন্ডার না করা বা একটি হালকা লোডার দেখানো যেতে পারে
   if (loading) {
     return null;
   }
 
-  // লগইন করা ইউজারের জন্য প্রোফাইল ড্রপডাউন মেনু
   const ProfileDropdown = (
     <div className="dropdown dropdown-end relative z-50">
-      {/* প্রোফাইল বাটন: ছবিতে হোভার করলে নাম দেখানোর জন্য data-tip ব্যবহার করা হয়েছে */}
       <div
         tabIndex={0}
         role="button"
         className="btn btn-ghost btn-circle avatar tooltip tooltip-bottom"
-        data-tip={user?.displayName || "Profile"} // হোভার করে নাম দেখানো (Challenge Rqmt)
+        data-tip={user?.displayName || "Profile"}
       >
         <div className="w-10 rounded-full border-2 border-white">
           <img
@@ -51,7 +45,6 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* ড্রপডাউন মেনু কন্টেন্ট */}
       <ul
         tabIndex={0}
         className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow-lg bg-white border border-gray-200"
@@ -60,7 +53,6 @@ const Navbar = () => {
           {user?.displayName || "User Profile"}
         </li>
 
-        {/* প্রোটেক্টেড রাউটস (চ্যালেঞ্জ রিকোয়ারমেন্ট) */}
         <li>
           <Link to={"/create-event"} className="hover:bg-green-100">
             Create Event
@@ -77,7 +69,6 @@ const Navbar = () => {
           </Link>
         </li>
 
-        {/* লগআউট বাটন */}
         <li className="mt-2 border-t pt-2">
           <button
             onClick={handleSignout}
@@ -90,7 +81,6 @@ const Navbar = () => {
     </div>
   );
 
-  // লগআউট করা ইউজারের জন্য সাইন-ইন বাটন
   const SignInButton = (
     <Link to={"/login"}>
       <button className="bg-purple-600 text-white px-4 py-2 rounded-md font-semibold cursor-pointer hover:bg-purple-700 transition duration-300 shadow-md">
@@ -102,7 +92,6 @@ const Navbar = () => {
   return (
     <div className="bg-green-600 py-2 shadow-md sticky top-0 z-40">
       <Container className="flex items-center justify-between">
-        {/* লোগো/অ্যাপ নাম */}
         <figure>
           <Link to="/" className="flex gap-3 items-center">
             <img
@@ -116,18 +105,16 @@ const Navbar = () => {
           </Link>
         </figure>
 
-        {/* নেভিগেশন লিংকস */}
         <ul className="hidden md:flex items-center gap-4 text-gray-700 font-medium">
           <li>
             <MyLink to={"/"}>Home</MyLink>
           </li>
-          {/* Upcoming Events পাবলিক পেজ, তাই এটি মূল নেভিগেশনে থাকবে */}
+
           <li>
             <MyLink to={"/upcoming-events"}>Upcoming Events</MyLink>
           </li>
         </ul>
 
-        {/* কন্ডিশনাল Auth বাটন/প্রোফাইল */}
         <div className="flex items-center gap-3">
           {/* Theme Toggler এখানে বা MainLayout এ যুক্ত হবে */}
           {/* <ThemeToggler /> */}
