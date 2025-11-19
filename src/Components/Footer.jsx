@@ -9,7 +9,7 @@ import {
   FaPhone,
   FaHandHoldingHeart,
 } from "react-icons/fa";
-import Container from "../Components/Container";
+import Container from "./Container";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
