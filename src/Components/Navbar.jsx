@@ -116,10 +116,6 @@ const Navbar = () => {
         </ul>
 
         <div className="flex items-center gap-3">
-          {/* Theme Toggler এখানে বা MainLayout এ যুক্ত হবে */}
-          {/* <ThemeToggler /> */}
-
-          {/* ইউজার লগইন করা থাকলে ড্রপডাউন দেখাবে, অন্যথায় সাইন-ইন বাটন */}
           {user ? ProfileDropdown : SignInButton}
         </div>
       </Container>

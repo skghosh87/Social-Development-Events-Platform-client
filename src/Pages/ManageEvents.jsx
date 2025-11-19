@@ -5,7 +5,6 @@ import { FaEdit, FaTrash, FaSpinner, FaCalendarAlt } from "react-icons/fa";
 import axios from "axios";
 import { toast } from "react-toastify";
 
-// ডেমো ইভেন্ট ডেটা (আপনার ব্যাকএন্ড থেকে এটি লোড হবে)
 const mockEvents = [
   {
     _id: "1",
@@ -32,7 +31,6 @@ const ManageEvents = () => {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // ডেটা লোড করার ফাংশন
   const fetchMyEvents = async () => {
     if (!user?.email) {
       setLoading(false);
@@ -40,15 +38,14 @@ const ManageEvents = () => {
     }
 
     try {
-      // TODO: ইভেন্ট আনার জন্য সঠিক API Endpoint ব্যবহার করুন
       const response = await axios.get(
         `${SERVER_BASE_URL}/api/events/organizer/${user.email}`
       );
-      setEvents(response.data.events || mockEvents); // আপাতত mockEvents ব্যবহার করা হয়েছে
+      setEvents(response.data.events || mockEvents);
       setLoading(false);
     } catch (error) {
       console.error("Error fetching events:", error);
-      setEvents(mockEvents); // ত্রুটি হলে ডেমো ডেটা
+      setEvents(mockEvents);
       setLoading(false);
       toast.error("ইভেন্ট লোড করতে সমস্যা হয়েছে।");
     }
@@ -58,18 +55,16 @@ const ManageEvents = () => {
     fetchMyEvents();
   }, [user]);
 
-  // ডিলিট হ্যান্ডলার
   const handleDelete = async (id) => {
     if (window.confirm("আপনি কি নিশ্চিত যে এই ইভেন্টটি ডিলিট করতে চান?")) {
       try {
-        // TODO: ডিলিট করার API কল যুক্ত করুন
         const response = await axios.delete(
           `${SERVER_BASE_URL}/api/events/${id}`
         );
 
         if (response.data.success) {
           toast.success("ইভেন্ট সফলভাবে ডিলিট করা হয়েছে।");
-          // ডিলিট করার পর তালিকা রিফ্রেশ করা
+
           fetchMyEvents();
         } else {
           toast.error(response.data.message || "ডিলিট করতে ব্যর্থ।");
@@ -80,10 +75,7 @@ const ManageEvents = () => {
     }
   };
 
-  // এডিট হ্যান্ডলার (নেভিগেশনের জন্য প্রস্তুত)
   const handleEdit = (id) => {
-    // TODO: এডিট পেজে নেভিগেট করার লজিক এখানে যুক্ত হবে
-    // navigate(`/edit-event/${id}`);
     toast.info(`ইভেন্ট ID ${id} এডিট করার জন্য প্রস্তুত।`);
   };
 
@@ -96,7 +88,6 @@ const ManageEvents = () => {
     );
   }
 
-  // ইভেন্ট না থাকলে Empty State
   if (events.length === 0) {
     return (
       <Container className="py-20 text-center bg-gray-50 rounded-lg shadow-lg">
@@ -128,16 +119,16 @@ const ManageEvents = () => {
           <thead className="bg-blue-50">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
-                ইভেন্টের নাম
+                Event Name
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
-                তারিখ
+                Date
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
-                ক্যাটাগরি
+                Categories
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
-                অংশগ্রহণকারী
+                Participent
               </th>
               <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider">
                 Action
@@ -171,7 +162,6 @@ const ManageEvents = () => {
                   {event.participants}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium flex justify-center space-x-3">
-                  {/* এডিট বাটন */}
                   <button
                     onClick={() => handleEdit(event._id)}
                     className="text-blue-600 hover:text-blue-900 p-2 rounded-full hover:bg-blue-100 transition duration-150"
@@ -180,7 +170,6 @@ const ManageEvents = () => {
                     <FaEdit />
                   </button>
 
-                  {/* ডিলিট বাটন */}
                   <button
                     onClick={() => handleDelete(event._id)}
                     className="text-red-600 hover:text-red-900 p-2 rounded-full hover:bg-red-100 transition duration-150"

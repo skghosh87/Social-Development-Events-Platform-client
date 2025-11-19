@@ -13,7 +13,6 @@ import { Link, useNavigate } from "react-router-dom";
 
 const SERVER_BASE_URL = "http://localhost:5000";
 
-// ডেমো ইভেন্ট ডেটা (আপনার API থেকে আসল ডেটা আসবে)
 const mockEvents = [
   {
     _id: "101",
@@ -52,22 +51,19 @@ const UpcomingEvents = () => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  // Axios ব্যবহার করে ডেটা লোড করার ফাংশন
   const fetchUpcomingEvents = async () => {
     setLoading(true);
     try {
-      // TODO: আপনার API Endpoint এখানে ব্যবহার করুন
       const response = await axios.get(
         `${SERVER_BASE_URL}/api/events/upcoming`
       );
-      // যদি API ডেটা না থাকে, তাহলে mockEvents ব্যবহার করা হয়েছে
+
       setEvents(response.data.events || mockEvents);
       setLoading(false);
     } catch (error) {
       console.error("Error fetching upcoming events:", error);
-      setEvents(mockEvents); // ত্রুটি হলে ডেমো ডেটা
+      setEvents(mockEvents);
       setLoading(false);
-      // toast.error("ইভেন্ট লোড করতে সমস্যা হয়েছে।");
     }
   };
 
@@ -75,11 +71,8 @@ const UpcomingEvents = () => {
     fetchUpcomingEvents();
   }, []);
 
-  // ইভেন্টে জয়েন করার হ্যান্ডলার
   const handleJoin = (id) => {
-    // এই বাটনটি প্রোটেক্টেড, তাই ইউজারকে লগইন পেজে রিডাইরেক্ট করা উচিত
     navigate(`/event-details/${id}`);
-    // লগইন স্ট্যাটাস চেক করে পরে জয়েন করার লজিক লিখতে হবে
   };
 
   return (
@@ -118,16 +111,16 @@ const UpcomingEvents = () => {
         {loading ? (
           <div className="text-center py-10">
             <FaSpinner className="text-5xl text-blue-500 animate-spin mx-auto" />
-            <p className="mt-4 text-gray-600">ইভেন্টগুলো লোড হচ্ছে...</p>
+            <p className="mt-4 text-gray-600">Event Loading...</p>
           </div>
         ) : events.length === 0 ? (
           <div className="text-center py-10 bg-white rounded-lg shadow-lg border border-gray-200">
             <FaCalendarAlt className="text-6xl text-gray-400 mx-auto" />
             <h2 className="text-2xl font-bold mt-4 text-gray-700">
-              বর্তমানে কোনো ইভেন্ট নেই।
+              No Event At this Time.
             </h2>
             <p className="text-gray-500 mt-2">
-              নতুন ইভেন্টের জন্য পরবর্তীতে আবার দেখুন।
+              Please Try Again to show the Event.
             </p>
           </div>
         ) : (
