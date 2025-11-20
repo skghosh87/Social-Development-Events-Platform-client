@@ -21,7 +21,7 @@ const mockEvents = [
     location: "কলাবাগান লেক, ঢাকা",
     category: "Environment",
     description: "দূষণমুক্ত পরিবেশ গড়ার জন্য একটি যৌথ উদ্যোগ।",
-    image: "https://i.ibb.co/6P1t1Bq/event-2.jpg",
+    image: "https://i.ibb.co.com/pBjbq01L/image.jpg",
     participants: 25,
   },
   {
@@ -31,7 +31,7 @@ const mockEvents = [
     location: "মিরপুর প্রাথমিক বিদ্যালয়",
     category: "Education",
     description: "শিশুদের পড়াশোনায় উৎসাহিত করার জন্য মজার সেশন।",
-    image: "https://i.ibb.co/30f2q39/event-1.jpg",
+    image: "https://i.ibb.co.com/Ps73K7xD/image.jpg",
     participants: 40,
   },
   {
@@ -41,7 +41,7 @@ const mockEvents = [
     location: "ঢাকা মেডিকেল কলেজ প্রাঙ্গণ",
     category: "Health",
     description: "এক ইউনিট রক্ত দিয়ে জীবন বাঁচান।",
-    image: "https://i.ibb.co/10b2h1J/event-4.jpg",
+    image: "https://i.ibb.co.com/Ngg3Nk2D/image.jpg",
     participants: 75,
   },
 ];

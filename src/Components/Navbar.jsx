@@ -7,7 +7,8 @@ import { toast } from "react-toastify";
 import { useContext } from "react";
 import { AuthContext } from "../Context/AuthContext";
 
-const DEFAULT_AVATAR = "https://i.ibb.co/5vFwYxS/default-user.png";
+const DEFAULT_AVATAR =
+  "https://i.ibb.co.com/QvPMZg8h/a-man-profile-avatar-icon-with-a-white-background-free-vector.jpg";
 
 const Navbar = () => {
   const navigate = useNavigate();
