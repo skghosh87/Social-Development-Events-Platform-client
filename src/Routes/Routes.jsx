@@ -9,6 +9,7 @@ import CreateEvent from "../Pages/CreateEvent";
 import ManageEvents from "../Pages/ManageEvents";
 import JoinedEvents from "../Pages/JoinedEvents";
 import Login from "../Pages/Login";
+import EventDetails from "../Pages/EventDetails";
 
 export const router = createBrowserRouter([
   {
@@ -24,6 +25,11 @@ export const router = createBrowserRouter([
         path: "/upcoming-events",
         element: <UpcomingEvents />,
       },
+
+      {
+        path: "/event-details/:id",
+        element: <EventDetails />,
+      },
       {
         path: "/login",
         element: <Login />,
@@ -33,6 +39,7 @@ export const router = createBrowserRouter([
         element: <Register />,
       },
 
+      // প্রাইভেট রুট
       {
         path: "/create-event",
         element: (
