@@ -31,7 +31,7 @@ const sliderData = [
   },
 ];
 
-const HeroSection = () => {
+const BannerSection = () => {
   return (
     <div className="h-[65vh] md:h-[80vh] w-full ">
       <Swiper
@@ -83,4 +83,4 @@ const HeroSection = () => {
   );
 };
 
-export default HeroSection;
+export default BannerSection;

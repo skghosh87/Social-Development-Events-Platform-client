@@ -1,7 +1,7 @@
 import React from "react";
 import Container from "../Container";
 
-const NewsLetter = () => {
+const NewsLetterSection = () => {
   return (
     <div>
       <section className="py-16 bg-blue-600">
@@ -35,4 +35,4 @@ const NewsLetter = () => {
   );
 };
 
-export default NewsLetter;
+export default NewsLetterSection;

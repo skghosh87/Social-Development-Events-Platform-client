@@ -15,7 +15,7 @@ const galleryPhotos = [
   "https://i.ibb.co.com/PZqK5qS1/images-2.jpg",
 ];
 
-const Moments = () => {
+const GallerySection = () => {
   return (
     <div>
       <section className="py-10 bg-gray-50">
@@ -57,4 +57,4 @@ const Moments = () => {
   );
 };
 
-export default Moments;
+export default GallerySection;

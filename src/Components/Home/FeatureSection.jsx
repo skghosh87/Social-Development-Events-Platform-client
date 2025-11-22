@@ -7,7 +7,7 @@ import {
 } from "react-icons/fa";
 import Container from "../Container";
 
-const CoreFeature = () => {
+const FeatureSection = () => {
   const features = [
     {
       icon: FaCalendarCheck,
@@ -67,4 +67,4 @@ const CoreFeature = () => {
   );
 };
 
-export default CoreFeature;
+export default FeatureSection;

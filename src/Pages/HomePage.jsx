@@ -1,16 +1,17 @@
 import React from "react";
-import HeroSection from "../Components/Home/HeroSection";
-import CoreFeature from "../Components/Home/CoreFeature";
-import Moments from "../Components/Home/Moments";
-import NewsLetter from "../Components/Home/NewsLetter";
+
+import BannerSection from "../Components/Home/BannerSection";
+import FeatureSection from "../Components/Home/FeatureSection";
+import GallerySection from "../Components/Home/GallerySection";
+import NewsLetterSection from "../Components/Home/NewsLetterSection";
 
 const HomePage = () => {
   return (
     <div>
-      <HeroSection />
-      <CoreFeature />
-      <Moments />
-      <NewsLetter />
+      <BannerSection />
+      <FeatureSection />
+      <GallerySection />
+      <NewsLetterSection />
     </div>
   );
 };
