@@ -9,7 +9,7 @@ import {
   FaEnvelope,
   FaUser,
 } from "react-icons/fa";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import axios from "axios"; // <-- নতুন: Axios ইম্পোর্ট করা হলো
 
 const CreateEvent = () => {
@@ -48,27 +48,20 @@ const CreateEvent = () => {
       );
 
       if (response.data.success) {
-        toast.success("🎉 ইভেন্ট সফলভাবে তৈরি হয়েছে!");
+        toast.success("🎉 Event Create Successfully!");
         form.reset();
-        setEventDate(new Date()); // DatePicker রিসেট
+        setEventDate(new Date());
       } else {
-        // সার্ভার থেকে আসা ত্রুটি বার্তা
-        toast.error(response.data.message || "❌ ইভেন্ট তৈরি ব্যর্থ হয়েছে।");
+        toast.error(response.data.message || "❌ Event Create UnSuccessfully");
       }
     } catch (error) {
-      // নেটওয়ার্ক বা অন্যান্য HTTP ত্রুটি হ্যান্ডলিং
       console.error("Error creating event:", error);
       if (error.response) {
-        // সার্ভার রেসপন্স দিয়েছে, কিন্তু তা 2xx নয় (যেমন 400, 500)
-        toast.error(
-          `Error: ${error.response.data.message || "সার্ভার ত্রুটি!"}`
-        );
+        toast.error(`Error: ${error.response.data.message || "Server Error!"}`);
       } else if (error.request) {
-        // রিকোয়েস্ট পাঠানো হয়েছে কিন্তু কোনো রেসপন্স আসেনি (যেমন সার্ভার ডাউন)
-        toast.error("নেটওয়ার্ক ত্রুটি! সার্ভার চলছে কিনা নিশ্চিত করুন।");
+        toast.error("Network Error! Please Confirm Server is running।");
       } else {
-        // অন্যান্য ত্রুটি
-        toast.error("একটি অপ্রত্যাশিত ত্রুটি ঘটেছে।");
+        toast.error("An unexpected error occurred।");
       }
     }
   };
@@ -85,7 +78,6 @@ const CreateEvent = () => {
         </p>
 
         <form onSubmit={handleCreateEvent} className="space-y-6">
-          {/* ইভেন্ট ডিটেইলস সেকশন */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Event Name */}
             <div>
@@ -216,6 +208,7 @@ const CreateEvent = () => {
           </button>
         </form>
       </div>
+      <ToastContainer />
     </Container>
   );
 };
