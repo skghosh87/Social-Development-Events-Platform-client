@@ -7,7 +7,7 @@ import { toast } from "react-toastify";
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../Context/AuthContext";
 
-const DEFAULT_AVATAR = "/Default-User.png";
+const DEFAULT_AVATAR = "/default-user.png";
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -15,7 +15,6 @@ const Navbar = () => {
   const { user, signoutUserFunc, loading } = useContext(AuthContext);
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
 
-  // থিম পরিবর্তনের লজিক
   useEffect(() => {
     const html = document.querySelector("html");
     html.setAttribute("data-theme", theme);
@@ -26,7 +25,6 @@ const Navbar = () => {
     setTheme(checked ? "dark" : "light");
   };
 
-  // সাইনআউট লজিক
   const handleSignout = () => {
     signoutUserFunc()
       .then(() => {
@@ -38,7 +36,6 @@ const Navbar = () => {
       });
   };
 
-  // প্রোফাইল ড্রপডাউন মেনু
   const ProfileDropdown = (
     <div className="dropdown dropdown-end relative z-50">
       <div
@@ -64,7 +61,6 @@ const Navbar = () => {
         </li>
         <li className="mt-1">
           {" "}
-          {/* <-- নতুন আইটেম যোগ করুন */}
           <Link
             to={"/profile-update"}
             className="hover:bg-base-100 font-semibold"
@@ -100,7 +96,6 @@ const Navbar = () => {
     </div>
   );
 
-  // লগইন বাটন
   const SignInButton = (
     <Link to={"/login"}>
       <button className="bg-purple-600 text-white px-4 py-2 rounded-md font-semibold cursor-pointer hover:bg-purple-700 transition duration-300 shadow-md">
@@ -109,7 +104,6 @@ const Navbar = () => {
     </Link>
   );
 
-  // থিম টগল কম্পোনেন্ট
   const ThemeToggle = (
     <label
       className="swap swap-rotate mr-2 tooltip tooltip-bottom"

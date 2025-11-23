@@ -106,7 +106,7 @@ const Login = () => {
           </h2>
           <form onSubmit={handleSignin} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 mb-1 ">
                 Email
               </label>
               <input
@@ -114,7 +114,7 @@ const Login = () => {
                 name="email"
                 ref={emailRef}
                 placeholder="example@email.com"
-                className="mt-1 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 transition duration-150"
+                className="mt-1 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 transition duration-150  text-gray-900 dark:text-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400"
                 required
               />
             </div>
@@ -127,7 +127,7 @@ const Login = () => {
                 type={show ? "text" : "password"}
                 name="password"
                 placeholder="••••••••"
-                className="mt-1 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 transition duration-150"
+                className="mt-1 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 transition duration-150  text-gray-900 dark:text-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400"
                 required
               />
               <span

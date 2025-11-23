@@ -37,9 +37,12 @@ const Register = () => {
       await createUser(email, password);
       await updateUser(name, photoURL);
 
-      toast.success("Registration Successful! Welcome to GreenNest ", {
-        position: "top-center",
-      });
+      toast.success(
+        "Registration Successful! Welcome to Social Development Events ",
+        {
+          position: "top-center",
+        }
+      );
       navigate("/");
     } catch (error) {
       const errorMessage = parseFirebaseError(error);
@@ -83,14 +86,14 @@ const Register = () => {
           </h2>
           <form onSubmit={handleSignup} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-base-100 mb-1">
                 Full Name
               </label>
               <input
                 type="text"
                 name="name"
                 placeholder="Please Input Your Name"
-                className="mt-1 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 transition duration-150"
+                className="mt-1 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 transition duration-150 text-gray-900 dark:text-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400"
                 required
               />
             </div>
@@ -103,7 +106,7 @@ const Register = () => {
                 type="text"
                 name="photo"
                 placeholder="Your photo URL here"
-                className="mt-1 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 transition duration-150"
+                className="mt-1 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 transition duration-150 text-gray-900 dark:text-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400"
               />
             </div>
 
@@ -115,7 +118,7 @@ const Register = () => {
                 type="email"
                 name="email"
                 placeholder="example@email.com"
-                className="mt-1 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 transition duration-150"
+                className="mt-1 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 transition duration-150 text-gray-900 dark:text-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400"
                 required
               />
             </div>
@@ -128,7 +131,7 @@ const Register = () => {
                 type={show ? "text" : "password"}
                 name="password"
                 placeholder="••••••••"
-                className="mt-1 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 transition duration-150"
+                className="mt-1 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 transition duration-150 text-gray-900 dark:text-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400"
                 required
               />
               <span
