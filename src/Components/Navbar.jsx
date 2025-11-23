@@ -7,8 +7,7 @@ import { toast } from "react-toastify";
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../Context/AuthContext";
 
-const DEFAULT_AVATAR =
-  "https://i.ibb.co.com/QvPMZg8h/a-man-profile-avatar-icon-with-a-white-background-free-vector.jpg";
+const DEFAULT_AVATAR = "/Default-User.png";
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -56,7 +55,6 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* প্রোফাইল ড্রপডাউন কন্টেন্ট। bg-white এবং কাস্টম বর্ডার সরানো হয়েছে */}
       <ul
         tabIndex={0}
         className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow-lg"
@@ -64,19 +62,28 @@ const Navbar = () => {
         <li className="p-2 text-center text-lg font-bold text-green-700 border-b mb-1">
           {user?.displayName || "User Profile"}
         </li>
-
+        <li className="mt-1">
+          {" "}
+          {/* <-- নতুন আইটেম যোগ করুন */}
+          <Link
+            to={"/profile-update"}
+            className="hover:bg-base-100 font-semibold"
+          >
+            Update Profile
+          </Link>
+        </li>
         <li>
-          <Link to={"/create-event"} className="hover:bg-green-100">
+          <Link to={"/create-event"} className="hover:bg-base-100">
             Create Event
           </Link>
         </li>
         <li>
-          <Link to={"/manage-events"} className="hover:bg-green-100">
+          <Link to={"/manage-events"} className="hover:bg-base-100">
             Manage Events
           </Link>
         </li>
         <li>
-          <Link to={"/joined-events"} className="hover:bg-green-100">
+          <Link to={"/joined-events"} className="hover:bg-base-100">
             Joined Events
           </Link>
         </li>
@@ -84,7 +91,7 @@ const Navbar = () => {
         <li className="mt-2 border-t pt-2">
           <button
             onClick={handleSignout}
-            className="text-red-500 font-semibold hover:bg-red-50 hover:text-red-600 w-full text-center"
+            className="btn btn-error btn-sm  text-white font-semibold hover:bg-red-50 hover:text-red-600 w-full text-center"
           >
             Logout
           </button>
@@ -108,14 +115,12 @@ const Navbar = () => {
       className="swap swap-rotate mr-2 tooltip tooltip-bottom"
       data-tip="Switch Theme"
     >
-      {/* বর্ডার যোগ করা হয়েছে: border-2 border-white */}
       <input
         onChange={(e) => handleTheme(e.target.checked)}
         type="checkbox"
         defaultChecked={localStorage.getItem("theme") === "dark"}
         className="toggle border-2 border-white"
       />
-      {/* আইকন বা SVG এখানে অপরিবর্তিত থাকবে */}
     </label>
   );
 
@@ -129,14 +134,13 @@ const Navbar = () => {
               className="w-[55px] bg-white rounded-full"
               alt="Logo"
             />
-            {/* কন্ট্রাস্ট উন্নত করতে text-[#0DBEFF] এর পরিবর্তে text-white */}
+
             <span className="font-bold text-2xl text-white hover:text-yellow-400">
               SDEP
             </span>
           </Link>
         </figure>
 
-        {/* নেভিগেশন লিংক */}
         <ul className="hidden md:flex items-center gap-4 text-white font-medium">
           <li>
             <MyLink to={"/"}>Home</MyLink>
@@ -146,12 +150,9 @@ const Navbar = () => {
           </li>
         </ul>
 
-        {/* প্রোফাইল, লগইন এবং থিম সেকশন */}
         <div className="flex items-center gap-3">
-          {/* থিম টগল এখন ড্রপডাউনের বাইরে */}
           {ThemeToggle}
 
-          {/* লোডিং অবস্থায় কিছু দেখাবে না, লোডিং শেষ হলে লগইন/প্রোফাইল দেখাবে */}
           {!loading && (user ? ProfileDropdown : SignInButton)}
         </div>
       </Container>

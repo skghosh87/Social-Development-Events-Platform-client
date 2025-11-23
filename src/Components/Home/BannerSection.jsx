@@ -8,7 +8,7 @@ import "swiper/css";
 import "swiper/css/pagination";
 
 import "swiper/css/effect-fade";
-import { Link } from "react-router";
+import { Link } from "react-router-dom";
 
 const sliderData = [
   {

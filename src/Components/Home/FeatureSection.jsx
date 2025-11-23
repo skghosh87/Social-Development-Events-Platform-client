@@ -42,7 +42,7 @@ const FeatureSection = () => {
     <div>
       <section className="py-10">
         <Container>
-          <h2 className="text-3xl font-bold text-center text-gray-800 mb-10 border-b-2 border-blue-500 inline-block mx-auto pb-1 ">
+          <h2 className="text-3xl font-bold text-center text-base-content mb-10 border-b-2 border-blue-500 inline-block mx-auto pb-1 ">
             Our Core Features
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
