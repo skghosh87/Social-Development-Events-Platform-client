@@ -17,7 +17,7 @@ const Navbar = () => {
 
   useEffect(() => {
     const html = document.querySelector("html");
-    // Assuming Tailwind/DaisyUI theme implementation using data-theme
+
     html.setAttribute("data-theme", theme);
     localStorage.setItem("theme", theme);
   }, [theme]);
@@ -27,7 +27,6 @@ const Navbar = () => {
   };
 
   const handleSignout = () => {
-    // FIX 4: logOut ফাংশনটি ব্যবহার করা হলো
     logOut()
       .then(() => {
         toast.success("Signout successful");
@@ -38,12 +37,10 @@ const Navbar = () => {
       });
   };
 
-  // Loading State Handling: If loading, show a skeleton/spinner
   if (loading) {
     return (
       <div className="bg-green-600 py-2 shadow-md sticky top-0 z-40">
         <Container className="flex items-center justify-between h-[55px]">
-          {/* A simple loading placeholder */}
           <div className="w-full bg-green-500 rounded-lg animate-pulse h-8"></div>
         </Container>
       </div>
@@ -150,7 +147,6 @@ const Navbar = () => {
 
         <ul className="hidden md:flex items-center gap-4 text-white font-medium">
           <li>
-            {/* Assuming MyLink was a wrapper around Link/NavLink */}
             <Link
               to={"/"}
               className="hover:text-yellow-400 transition duration-150"
@@ -171,7 +167,6 @@ const Navbar = () => {
         <div className="flex items-center gap-3">
           {ThemeToggle}
 
-          {/* loading check is now handled at the top, only check for user */}
           {user ? ProfileDropdown : SignInButton}
         </div>
       </Container>

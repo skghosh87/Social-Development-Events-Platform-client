@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import Container from "../Components/Container";
-// FIX 1: useContext(AuthContext) এর বদলে কাস্টম useAuth হুক import করা হলো
+
 import { useAuth } from "../Context/AuthProvider";
 import {
   FaCalendarPlus,
@@ -14,18 +14,14 @@ import { toast, ToastContainer } from "react-toastify";
 import axios from "axios";
 
 const CreateEvent = () => {
-  // FIX 2: useAuth হুক থেকে user এবং loading ডিস্ট্রাকচার করা হলো
   const { user, loading } = useAuth();
   const [eventDate, setEventDate] = useState(new Date());
 
-  // আপাতত লোকালহোস্ট ব্যবহার করা হলো। সার্ভার সেটআপের পর এটি পরিবর্তন করতে হবে।
   const SERVER_BASE_URL = "http://localhost:5000";
 
-  // ফর্ম সাবমিট হ্যান্ডলার (Axios ব্যবহার করে)
   const handleCreateEvent = async (e) => {
     e.preventDefault();
 
-    // নিরাপত্তা নিশ্চিত করার জন্য ক্লায়েন্ট সাইডেও user চেক
     if (!user || !user.email) {
       toast.error("Please log in to create an event.");
       return;
@@ -33,23 +29,21 @@ const CreateEvent = () => {
 
     const form = e.target;
 
-    // ফর্ম ডেটা সংগ্রহ
     const eventData = {
       eventName: form.eventName.value,
       category: form.category.value,
       location: form.location.value,
       description: form.description.value,
       image: form.image.value,
-      // DatePicker থেকে ISO ফরমেটে ডেট পাঠানো
+
       eventDate: eventDate.toISOString(),
       organizerName: user?.displayName,
-      organizerEmail: user?.email, // Firebase থেকে নিশ্চিত ইমেইল ব্যবহার
+      organizerEmail: user?.email,
       postedAt: new Date().toISOString(),
       participants: 0,
     };
 
     try {
-      // Axios দিয়ে POST রিকোয়েস্ট
       const response = await axios.post(
         `${SERVER_BASE_URL}/api/events`,
         eventData
@@ -83,7 +77,6 @@ const CreateEvent = () => {
     );
   }
 
-  // অথেন্টিকেশন স্টেট চেক: লগইন না থাকলে ফর্ম হাইড করা
   if (!user) {
     return (
       <Container className="py-20 text-center">

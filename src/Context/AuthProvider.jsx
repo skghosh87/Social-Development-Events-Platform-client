@@ -19,8 +19,6 @@ const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // ----------- Auth Methods -----------
-
   const createUser = (email, password) => {
     setLoading(true);
     return createUserWithEmailAndPassword(auth, email, password);
@@ -50,8 +48,6 @@ const AuthProvider = ({ children }) => {
     return signOut(auth);
   };
 
-  // --------- Listen to Auth State ---------
-
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
@@ -60,8 +56,6 @@ const AuthProvider = ({ children }) => {
 
     return () => unsubscribe();
   }, []);
-
-  // --------- Provide Everything ---------
 
   const authInfo = {
     createUser,

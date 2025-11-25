@@ -14,19 +14,19 @@ const sliderData = [
   {
     title: "Our mission is to stand by people.",
     slogan: "Ideas Unite. Futures are Built. 🌍",
-    image: "https://i.ibb.co.com/YFJRfSwN/images-3.jpg", // সামাজিক উন্নয়নের ইভেন্টের জন্য একটি নতুন ইমেজ URL দিন
+    image: "https://i.ibb.co.com/YFJRfSwN/images-3.jpg",
     color: "from-blue-700/90",
   },
   {
     title: "Global Progress Forum",
     slogan: "Connecting Minds for Community Impact. 🤝",
-    image: "https://i.ibb.co.com/x8X90kt2/G4bs-CK5-W0-AAj9-A6.jpg", // সামাজিক উন্নয়নের ইভেন্টের জন্য একটি নতুন ইমেজ URL দিন
+    image: "https://i.ibb.co.com/x8X90kt2/G4bs-CK5-W0-AAj9-A6.jpg",
     color: "from-indigo-600/90",
   },
   {
     title: "Plant Trees, Save the Environment",
-    slogan: "Driving Sustainable Development, One Event at a Time. 🌱",
-    image: "https://i.ibb.co.com/j9XjxNbS/IMG-20190724-103607-Copy-Copy.jpg", // সামাজিক উন্নয়নের ইভেন্টের জন্য একটি নতুন ইমেজ URL দিন
+    slogan: "Driving Sustainable Development, One Event at a Time. ",
+    image: "https://i.ibb.co.com/j9XjxNbS/IMG-20190724-103607-Copy-Copy.jpg",
     color: "from-purple-600/90",
   },
 ];

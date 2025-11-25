@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-// FIX 1: useContext এবং AuthContext এর বদলে কাস্টম useAuth হুক import করা হলো
+
 import { useAuth } from "../Context/AuthProvider";
 import { toast } from "react-toastify";
 import {
@@ -9,22 +9,18 @@ import {
   EmailAuthProvider,
 } from "firebase/auth";
 import Container from "../Components/Container";
-import { auth } from "../Firebase/firebase.config"; // ⭐ নিশ্চিত করুন এটি আপনার সঠিক পাথ
+import { auth } from "../Firebase/firebase.config";
 
-// পাসওয়ার্ড শক্তিমত্তা পরীক্ষা করার জন্য রেগুলার এক্সপ্রেশন:
-// কমপক্ষে ৬ ক্যারেক্টার, একটি আপারকেস এবং একটি লোয়ারকেস অক্ষর থাকতে হবে।
 const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z]).{6,}$/;
 
 const ProfileUpdate = () => {
-  // FIX 2: useContext(AuthContext) এর বদলে useAuth() ব্যবহার করা হলো
   const { user, loading, setUser } = useAuth();
 
-  // ফর্ম স্টেট
   const [displayName, setDisplayName] = useState(user?.displayName || "");
   const [photoURL, setPhotoURL] = useState(user?.photoURL || "");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [currentPassword, setCurrentPassword] = useState(""); // Re-authentication এর জন্য
+  const [currentPassword, setCurrentPassword] = useState("");
 
   if (loading) {
     return (
@@ -35,7 +31,6 @@ const ProfileUpdate = () => {
   }
 
   if (!user) {
-    // যদি ইউজার লগ ইন না থাকে, তবে একটি বার্তা প্রদর্শন করা উচিত
     return (
       <p className="text-center py-20 text-red-500 font-semibold">
         Please log in to update your profile.
@@ -43,20 +38,16 @@ const ProfileUpdate = () => {
     );
   }
 
-  // নাম এবং ছবি আপডেটের হ্যান্ডলার
   const handleGeneralUpdate = async (e) => {
     e.preventDefault();
     if (!user) return;
 
     try {
-      // Firebase updateProfile ফাংশন কল করা
       await updateProfile(user, {
         displayName: displayName,
         photoURL: photoURL,
       });
 
-      // AuthContext এর user স্টেট আপডেট করে UI রিফ্রেশ করা
-      // মনে রাখবেন, Firebase এর user অবজেক্টটি ইমিউটেবল, তাই নতুন অবজেক্ট তৈরি করতে হবে
       setUser({ ...user, displayName, photoURL });
       toast.success("Profile details updated successfully! 👍");
     } catch (error) {
@@ -64,7 +55,6 @@ const ProfileUpdate = () => {
     }
   };
 
-  // পাসওয়ার্ড আপডেটের হ্যান্ডলার
   const handlePasswordUpdate = async (e) => {
     e.preventDefault();
     const validationMessage =
@@ -75,34 +65,28 @@ const ProfileUpdate = () => {
       return;
     }
 
-    // পাসওয়ার্ড শক্তিমত্তা ভ্যালিডেশন
     if (!PASSWORD_REGEX.test(newPassword)) {
       toast.error(validationMessage);
       return;
     }
 
-    // Re-authentication এর জন্য বর্তমান পাসওয়ার্ড আবশ্যক
     if (!currentPassword) {
       toast.error("Please enter your current password for security.");
       return;
     }
 
-    // EmailAuthProvider ব্যবহার করে ক্রেডেনশিয়াল তৈরি করা
     const credential = EmailAuthProvider.credential(
       user.email,
       currentPassword
     );
 
     try {
-      // ১. Re-authenticate: Firebase এ নিরাপত্তার জন্য এই ধাপটি প্রয়োজন
       await reauthenticateWithCredential(user, credential);
 
-      // ২. পাসওয়ার্ড আপডেট
       await updatePassword(user, newPassword);
 
       toast.success("Password updated successfully! ✅");
 
-      // ফর্ম রিসেট করা
       setNewPassword("");
       setConfirmPassword("");
       setCurrentPassword("");
@@ -125,7 +109,7 @@ const ProfileUpdate = () => {
         👤 Update Your Profile{" "}
       </h2>{" "}
       <div className="max-w-xl mx-auto space-y-8">
-        {/* === ১. নাম এবং ছবি আপডেট ফর্ম === */}{" "}
+        {" "}
         <div className="card bg-base-200 shadow-xl p-6 border-t-4 border-green-500">
           {" "}
           <h3 className="text-2xl font-semibold mb-4 text-green-600">
@@ -170,8 +154,7 @@ const ProfileUpdate = () => {
               </button>{" "}
             </div>{" "}
           </form>{" "}
-        </div>
-        {/* --- */} {/* === ২. পাসওয়ার্ড আপডেট ফর্ম === */}{" "}
+        </div>{" "}
         <div className="card bg-base-200 shadow-xl p-6 border-t-4 border-red-500">
           {" "}
           <h3 className="text-2xl font-semibold mb-4 text-red-600">
@@ -179,7 +162,6 @@ const ProfileUpdate = () => {
           </h3>{" "}
           <form onSubmit={handlePasswordUpdate} className="space-y-4">
             {" "}
-            {/* Re-authentication এর জন্য বর্তমান পাসওয়ার্ড ইনপুট */}{" "}
             <div className="form-control">
               {" "}
               <label className="label">

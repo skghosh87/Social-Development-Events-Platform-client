@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-// AuthContext এর বদলে useAuth import করা হলো
+
 import { useAuth } from "../Context/AuthProvider";
 import axios from "axios";
 import { toast } from "react-toastify";
@@ -11,18 +11,16 @@ import {
   FaExclamationCircle,
   FaRegCalendarTimes,
 } from "react-icons/fa";
-import { Link } from "react-router-dom"; // ইভেন্ট ডিটেইলে যাওয়ার জন্য
+import { Link } from "react-router-dom";
 
 const SERVER_BASE_URL = "http://localhost:5000";
 
 const JoinedEvents = () => {
-  // useAuth থেকে user এবং loading স্টেট নেওয়া হলো
   const { user, loading: authLoading } = useAuth();
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // প্রমাণীকরণ লোড না হওয়া পর্যন্ত অপেক্ষা করুন
     if (authLoading) return;
 
     if (user?.email) {
@@ -34,8 +32,6 @@ const JoinedEvents = () => {
             `${SERVER_BASE_URL}/api/joined-events/${user.email}`
           );
 
-          // নোট: ইভেন্টের ডেটা eventDetails ফিল্ডের ভিতরে থাকতে পারে, তাই সেই অনুযায়ী ডেটা ম্যাপ করা হলো।
-          // যদি ব্যাকএন্ড সরাসরি ইভেন্ট অবজেক্টের অ্যারে রিটার্ন করে, তবে response.data সরাসরি ব্যবহার করা যাবে।
           setEvents(response.data);
         } catch (error) {
           console.error("Failed to load joined events:", error);
@@ -46,12 +42,10 @@ const JoinedEvents = () => {
       };
       fetchJoinedEvents();
     } else if (!user && !authLoading) {
-      // যদি প্রমাণীকরণ সম্পূর্ণ হয় কিন্তু ব্যবহারকারী লগইন না করে
       setLoading(false);
     }
   }, [user, authLoading]);
 
-  // 1. লোডিং স্টেট রেন্ডারিং
   if (loading || authLoading) {
     return (
       <Container className="py-20 text-center">
@@ -61,7 +55,6 @@ const JoinedEvents = () => {
     );
   }
 
-  // যদি ইউজার লগইন না করে
   if (!user) {
     return (
       <Container className="py-20 text-center">
@@ -74,7 +67,6 @@ const JoinedEvents = () => {
     );
   }
 
-  // 2. কোনো ইভেন্ট না থাকার স্টেট রেন্ডারিং
   if (events.length === 0) {
     return (
       <Container className="py-20 text-center">
@@ -95,7 +87,6 @@ const JoinedEvents = () => {
     );
   }
 
-  // 3. ইভেন্ট কার্ড রেন্ডারিং
   return (
     <Container className="py-12">
       <h2 className="text-4xl font-extrabold text-gray-900 mb-8 text-center">
@@ -104,13 +95,11 @@ const JoinedEvents = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {events.map((event) => (
-          // event_id অথবা _id ব্যবহার করা হলো, যেমনটা EventDetails-এ চেক করা হয়েছে
           <Link
             to={`/event-details/${event.event_id || event._id}`}
             key={event._id || event.event_id}
           >
             <div className="bg-white rounded-xl shadow-xl hover:shadow-2xl transition duration-300 overflow-hidden border-2 border-gray-100 h-full flex flex-col">
-              {/* ইভেন্টের ইমেজ */}
               <img
                 src={
                   event.image ||

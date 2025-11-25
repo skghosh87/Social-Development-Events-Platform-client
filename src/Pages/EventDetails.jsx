@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
-// FIX 1: AuthContext এর বদলে useAuth হুক import করা হলো
+
 import { useAuth } from "../Context/AuthProvider";
 import Container from "../Components/Container";
 import {
@@ -17,26 +17,21 @@ import {
 const SERVER_BASE_URL = "http://localhost:5000";
 
 const EventDetails = () => {
-  // 1. স্টেট এবং হুক ব্যবহার
-  const { id } = useParams(); // URL থেকে ইভেন্ট ID নেওয়া
-  // FIX 2: useAuth থেকে user এবং authLoading নেওয়া হলো
+  const { id } = useParams();
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
 
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [isJoining, setIsJoining] = useState(false); // জয়েনিং প্রসেসের জন্য লোডিং স্টেট
-  const [isJoined, setIsJoined] = useState(false); // ইউজার অলরেডি জয়েন করেছে কিনা
+  const [isJoining, setIsJoining] = useState(false);
+  const [isJoined, setIsJoined] = useState(false);
 
-  // 2. ইভেন্ট এবং জয়েন স্ট্যাটাস ফেচ করা
   useEffect(() => {
-    // প্রমাণীকরণ লোড না হওয়া পর্যন্ত অপেক্ষা করুন
     if (authLoading) return;
 
     const fetchEventDetails = async () => {
       setLoading(true);
       try {
-        // একক ইভেন্টের বিবরণ ফেচ করা
         const response = await axios.get(`${SERVER_BASE_URL}/api/events/${id}`);
         setEvent(response.data.event);
       } catch (error) {
@@ -45,45 +40,38 @@ const EventDetails = () => {
         setLoading(false);
         return;
       }
-      // ডেটা ফেচ হওয়ার পর ইনিশিয়াল লোডিং বন্ধ করা হচ্ছে
+
       setLoading(false);
     };
 
     const checkJoinStatus = async () => {
-      // ইভেন্ট ডেটা এবং ইউজার ইমেল না থাকলে চেক করার দরকার নেই
       if (!user?.email || !id) return;
 
       try {
-        // ইউজার এই ইভেন্টে জয়েন করেছে কিনা, তা চেক করা
-        // (নোট: এটি একটি অস্থায়ী রুট। অপ্টিমাইজেশনের জন্য একটি নির্দিষ্ট চেক রুট ব্যবহার করা উচিত।)
         const response = await axios.get(
           `${SERVER_BASE_URL}/api/joined-events/${user.email}`
         );
         const joinedEvents = response.data;
 
-        // ইভেন্ট আইডি বা MongoDB ID দিয়ে চেক করা
         const alreadyJoined = joinedEvents.some(
           (e) => e.event_id === id || e._id === id
         );
         setIsJoined(alreadyJoined);
       } catch (error) {
         console.error("Error checking join status:", error);
-        // ত্রুটি হলেও isJoined মিথ্যা থাকবে
       }
     };
 
-    // উভয় ফাংশন কল করা
     fetchEventDetails();
     if (user?.email) {
       checkJoinStatus();
     }
-  }, [id, user, authLoading, navigate]); // dependency array update করা হয়েছে
+  }, [id, user, authLoading, navigate]);
 
-  // 3. ইভেন্টে জয়েন করার ফাংশন
   const handleJoinEvent = async () => {
     if (authLoading || !user) {
       toast.warn("ইভেন্টে জয়েন করার আগে অনুগ্রহ করে লগইন করুন।");
-      navigate("/login"); // লগইন পেজে নেভিগেট করা
+      navigate("/login");
       return;
     }
 
@@ -108,10 +96,10 @@ const EventDetails = () => {
       if (response.data.success) {
         toast.success(response.data.message);
         setIsJoined(true);
-        // ইভেন্ট ডেটা ম্যানুয়ালি আপডেট করা
+
         setEvent((prevEvent) => ({
           ...prevEvent,
-          // participants ফিল্ডটি না থাকলে 0 ধরে নিয়ে 1 যোগ করা
+
           participants: (prevEvent.participants || 0) + 1,
         }));
       } else {
@@ -126,7 +114,6 @@ const EventDetails = () => {
     }
   };
 
-  // 4. শর্তাধীন রেন্ডারিং: লোডিং স্টেট
   if (loading || authLoading) {
     return (
       <Container className="py-20 text-center">
@@ -154,10 +141,8 @@ const EventDetails = () => {
     );
   }
 
-  // তারিখ এবং সময়ের ফরম্যাটিং
   const eventDate = new Date(event.eventDate);
 
-  // 5. রেন্ডারিং
   return (
     <Container className="py-12">
       <div className="max-w-4xl mx-auto bg-white shadow-2xl rounded-xl overflow-hidden">
@@ -214,7 +199,6 @@ const EventDetails = () => {
             <p>
               <strong>ইমেল:</strong> {event.organizerEmail}
             </p>
-            {/* organizerName নাও থাকতে পারে, তাই শুধু ইমেল দেখানো হলো */}
           </div>
 
           {/* Join Button */}

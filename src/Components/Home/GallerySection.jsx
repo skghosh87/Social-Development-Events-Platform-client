@@ -1,9 +1,8 @@
 import React from "react";
-import { Swiper, SwiperSlide } from "swiper/react"; // ⬅️ Swiper সঠিক ভাবে ইমপোর্ট করা হয়েছে
-import Container from "../Container"; // ধরে নিলাম এই কম্পোনেন্টটি বিদ্যমান
+import { Swiper, SwiperSlide } from "swiper/react";
+import Container from "../Container";
 import { Autoplay, Navigation } from "swiper/modules";
 
-// প্রয়োজনীয় CSS ইমপোর্ট যোগ করুন
 import "swiper/css";
 import "swiper/css/navigation";
 
@@ -24,7 +23,6 @@ const GallerySection = () => {
             Moments of Impact
           </h2>
 
-          {/* Swiper Slider ব্যবহার করে গ্যালারি তৈরি */}
           <Swiper
             modules={[Navigation, Autoplay]}
             spaceBetween={20}

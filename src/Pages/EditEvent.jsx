@@ -3,20 +3,18 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import Container from "../Components/Container";
-// FIX 1: AuthContext এর বদলে useAuth হুক import করা হলো
+
 import { useAuth } from "../Context/AuthProvider";
 import { FaEdit, FaSpinner, FaSave } from "react-icons/fa";
 
 const SERVER_BASE_URL = "http://localhost:5000";
 
 const EditEvent = () => {
-  // 1. হুকস এবং স্টেটস
-  const { id } = useParams(); // URL থেকে ইভেন্ট ID নেওয়া
-  // FIX 2: useAuth থেকে user এবং authLoading নেওয়া হলো
+  const { id } = useParams();
+
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
 
-  // internal loading state for data fetching and submission
   const [loading, setLoading] = useState(true);
   const [eventData, setEventData] = useState({
     eventName: "",
@@ -27,9 +25,7 @@ const EditEvent = () => {
     image: "",
   });
 
-  // 2. বর্তমান ইভেন্ট ডেটা ফেচ করা
   useEffect(() => {
-    // authLoading শেষ না হওয়া পর্যন্ত অপেক্ষা করুন
     if (authLoading) return;
 
     if (!user?.email) {
@@ -41,16 +37,15 @@ const EditEvent = () => {
     const fetchEvent = async () => {
       try {
         setLoading(true);
-        // ইভেন্ট ID ব্যবহার করে ইভেন্টের বিবরণ ফেচ করা
+
         const response = await axios.get(`${SERVER_BASE_URL}/api/events/${id}`);
 
         const fetchedEvent = response.data.event;
 
-        // ⭐ ডেটাবেস থেকে প্রাপ্ত ডেটা দিয়ে ফর্ম স্টেট পূরণ করা
         setEventData({
           eventName: fetchedEvent.eventName || "",
           category: fetchedEvent.category || "",
-          // ডেট টাইম ফরম্যাট করে ইনপুট ফিল্ডের জন্য উপযোগী করা
+
           eventDate:
             new Date(fetchedEvent.eventDate).toISOString().slice(0, 16) || "",
           location: fetchedEvent.location || "",
@@ -66,9 +61,8 @@ const EditEvent = () => {
     };
 
     fetchEvent();
-  }, [id, user, authLoading, navigate]); // dependency array update করা হয়েছে
+  }, [id, user, authLoading, navigate]);
 
-  // 3. ইনপুট হ্যান্ডলিং
   const handleChange = (e) => {
     const { name, value } = e.target;
     setEventData((prevData) => ({
@@ -77,23 +71,20 @@ const EditEvent = () => {
     }));
   };
 
-  // 4. ফর্ম সাবমিট (আপডেট লজিক)
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // authLoading অথবা data fetching loading থাকলে সাবমিট আটকানো
     if (authLoading || loading) return;
 
     setLoading(true);
     const updatedData = {
       ...eventData,
-      // নিশ্চিত করা organizerEmail ব্যবহার করা
+
       organizerEmail: user.email,
-      updatedAt: new Date().toISOString(), // আপডেটের সময় ট্র্যাক করা
+      updatedAt: new Date().toISOString(),
     };
 
     try {
-      // ⭐ PUT বা PATCH রিকোয়েস্ট ব্যবহার করে ডেটা আপডেট করা
       const response = await axios.put(
         `${SERVER_BASE_URL}/api/events/${id}`,
         updatedData
@@ -101,7 +92,7 @@ const EditEvent = () => {
 
       if (response.data.success) {
         toast.success("ইভেন্টটি সফলভাবে আপডেট করা হয়েছে!");
-        // আপডেটের পর ম্যানেজ ইভেন্ট পেজে ফিরিয়ে নেওয়া
+
         navigate("/manage-events");
       } else {
         toast.error(response.data.message || "ইভেন্ট আপডেট করতে ব্যর্থ।");
@@ -115,7 +106,6 @@ const EditEvent = () => {
     }
   };
 
-  // 5. রেন্ডারিং
   if (authLoading || loading) {
     return (
       <Container className="py-20 text-center">
@@ -127,7 +117,6 @@ const EditEvent = () => {
     );
   }
 
-  // লগইন না করা ইউজারদের জন্য অতিরিক্ত চেক (যদিও useEffect রিডাইরেক্ট করবে)
   if (!user) {
     return (
       <Container className="py-20 text-center">
@@ -227,7 +216,6 @@ const EditEvent = () => {
               type="datetime-local"
               name="eventDate"
               id="eventDate"
-              // `datetime-local` ইনপুট সঠিকভাবে পরিচালনার জন্য format আগেই করা হয়েছে
               value={eventData.eventDate}
               onChange={handleChange}
               required

@@ -16,15 +16,13 @@ const SERVER_BASE_URL = "http://localhost:5000";
 const UpcomingEvents = () => {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState(""); // ⬅️ NEW: সার্চ স্টেট
-  const [filterCategory, setFilterCategory] = useState(""); // ⬅️ NEW: ক্যাটাগরি স্টেট
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterCategory, setFilterCategory] = useState("");
   const navigate = useNavigate();
 
-  // 1. ডেটা ফেচিং লজিক (Query Parameters সহ)
   const fetchUpcomingEvents = async () => {
     setLoading(true);
 
-    // 2. Query Parameters তৈরি করা
     const params = new URLSearchParams();
     if (searchQuery) {
       params.append("search", searchQuery);
@@ -38,27 +36,24 @@ const UpcomingEvents = () => {
 
     try {
       const response = await axios.get(URL);
-      setEvents(response.data.events); // আশা করা হলো সার্ভার থেকে ডেটা আসছে
+      setEvents(response.data.events);
     } catch (error) {
       console.error("Error fetching upcoming events:", error);
-      // এখানে মক ডেটা ব্যবহার করা হলো, যদি সার্ভার ডাউন থাকে
+
       setEvents(mockEvents);
     } finally {
       setLoading(false);
     }
   };
 
-  // 3. useEffect Hook - Dependency Array তে Query স্টেট যুক্ত করা
   useEffect(() => {
-    // এই effect টি তখনই চলবে, যখন searchQuery বা filterCategory পরিবর্তন হবে
     fetchUpcomingEvents();
-  }, [searchQuery, filterCategory]); // ⬅️ UPDATED Dependency Array
+  }, [searchQuery, filterCategory]);
 
   const handleJoin = (id) => {
     navigate(`/event-details/${id}`);
   };
 
-  // 4. হ্যান্ডলার ফাংশন
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value);
   };
@@ -78,7 +73,6 @@ const UpcomingEvents = () => {
           community.
         </p>
 
-        {/* Search & Filter Bar - Handlers যুক্ত করা হলো */}
         <div className="flex flex-col md:flex-row gap-4 mb-10 p-4 bg-white shadow-lg rounded-lg border border-gray-200">
           <div className="flex items-center w-full md:w-2/3 border border-gray-300 rounded-lg p-2 bg-gray-50">
             <FaSearch className="text-gray-400 mx-2" />
@@ -86,16 +80,16 @@ const UpcomingEvents = () => {
               type="text"
               placeholder="Search by name or location..."
               className="w-full bg-transparent focus:outline-none text-gray-700"
-              value={searchQuery} // ⬅️ State value
-              onChange={handleSearchChange} // ⬅️ Handler
+              value={searchQuery}
+              onChange={handleSearchChange}
             />
           </div>
           <div className="flex items-center w-full md:w-1/3">
             <FaFilter className="text-gray-400 ml-2 mr-1" />
             <select
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition duration-150 text-gray-700"
-              value={filterCategory} // ⬅️ State value
-              onChange={handleCategoryChange} // ⬅️ Handler
+              value={filterCategory}
+              onChange={handleCategoryChange}
             >
               <option value="">Filter by Category</option>
               <option value="Environment">Environment</option>
@@ -106,7 +100,6 @@ const UpcomingEvents = () => {
           </div>
         </div>
 
-        {/* Event Display Logic (Same as before) */}
         {loading ? (
           <div className="text-center py-10">
             <FaSpinner className="text-5xl text-blue-500 animate-spin mx-auto" />
