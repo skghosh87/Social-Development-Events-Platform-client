@@ -1,120 +1,114 @@
-import React, { useContext, useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { FaEye, FaGoogle, FaSignInAlt } from "react-icons/fa";
+import { FaEye, FaSignInAlt } from "react-icons/fa";
 import { IoEyeOff } from "react-icons/io5";
-import { toast } from "react-toastify";
-import { AuthContext } from "../Context/AuthContext";
-import Container from "../Components/Container";
 import { FcGoogle } from "react-icons/fc";
+import { toast } from "react-toastify";
+import { useAuth } from "../Context/AuthProvider";
 
 const Login = () => {
   const [show, setShow] = useState(false);
-  const {
-    signInWithEmailAndPasswordFunc,
-    signInWithEmailFunc,
-    sendPassResetEmailFunc,
-    setLoading,
-    user,
-  } = useContext(AuthContext);
+  const emailRef = useRef(null);
+  const { signIn, signInWithGoogle, resetPassword, setLoading, user, loading } =
+    useAuth();
 
   const location = useLocation();
-
-  const from = location.state?.from || "/";
   const navigate = useNavigate();
+  const from = location.state?.from || "/";
 
-  if (user) {
-    navigate("/");
-    return;
-  }
+  useEffect(() => {
+    if (user) navigate(from);
+  }, [user, from, navigate]);
 
-  const emailRef = useRef(null);
-
-  const handleSignin = (e) => {
+  const handleSignin = async (e) => {
     e.preventDefault();
-    const email = e.target.email?.value;
-    const password = e.target.password?.value;
-    setLoading(true);
+    const email = e.target.email.value.trim();
+    const password = e.target.password.value;
 
-    signInWithEmailAndPasswordFunc(email, password)
-      .then(() => {
-        toast.success(
-          "Signin successful! Welcome back to Social Development Platform"
-        );
-        navigate(from);
-      })
-      .catch((e) => {
-        setLoading(false);
-
-        toast.error(
-          e.message
-            .replace("Firebase: Error (auth/", "")
-            .replace(").", "")
-            .replaceAll("-", " ")
-        );
-      });
-  };
-
-  const handleGoogleSignin = () => {
-    setLoading(true);
-    signInWithEmailFunc()
-      .then(() => {
-        toast.success("Google Signin Successful! ");
-        navigate(from);
-      })
-      .catch((e) => {
-        setLoading(false);
-
-        toast.error(
-          e.message
-            .replace("Firebase: Error (auth/", "")
-            .replace(").", "")
-            .replaceAll("-", " ")
-        );
-      });
-  };
-
-  const handleForgetPassword = () => {
-    const email = emailRef.current?.value;
-
-    if (!email) {
-      toast.error("Please enter your email address in the field above.");
+    if (!email || !password) {
+      toast.error("অনুগ্রহ করে ইমেল এবং পাসওয়ার্ড লিখুন।");
       return;
     }
 
-    sendPassResetEmailFunc(email)
-      .then(() => {
-        toast.success("Check your email to reset password.");
-      })
-      .catch((e) => {
-        setLoading(false);
+    try {
+      setLoading(true);
+      await signIn(email, password);
+      toast.success("লগইন সফল হয়েছে!");
+      navigate(from);
+    } catch (error) {
+      toast.error(
+        error.message
+          .replace("Firebase: Error (auth/", "")
+          .replace(").", "")
+          .replaceAll("-", " ")
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
-        toast.error(
-          e.message
-            .replace("Firebase: Error (auth/", "")
-            .replace(").", "")
-            .replaceAll("-", " ")
-        );
-      });
+  const handleGoogleSignin = async () => {
+    try {
+      setLoading(true);
+      await signInWithGoogle();
+      toast.success("Google Login Successful!");
+      navigate(from);
+    } catch (error) {
+      toast.error(
+        error.message
+          .replace("Firebase: Error (auth/", "")
+          .replace(").", "")
+          .replaceAll("-", " ")
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleForgetPassword = async () => {
+    const email = emailRef.current?.value.trim();
+    if (!email) {
+      toast.error("পাসওয়ার্ড রিসেট করতে ইমেল লিখুন।");
+      return;
+    }
+    try {
+      setLoading(true);
+      await resetPassword(email);
+      toast.success("পাসওয়ার্ড রিসেট লিংক আপনার ইমেলে পাঠানো হয়েছে।");
+    } catch (error) {
+      toast.error(
+        error.message
+          .replace("Firebase: Error (auth/", "")
+          .replace(").", "")
+          .replaceAll("-", " ")
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-      <Container className="flex items-center justify-center">
-        <div className="w-full max-w-lg bg-white p-8 rounded-xl shadow-2xl border border-green-300">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+      {" "}
+      <div className="w-full max-w-md">
+        {" "}
+        <div className="bg-white p-8 rounded-xl shadow-2xl border border-green-300">
+          {" "}
           <h2 className="text-3xl font-bold text-center text-green-700 mb-6 flex items-center justify-center gap-2">
-            <FaSignInAlt className="text-green-500" /> Welcome Back!
+            {" "}
+            <FaSignInAlt className="text-green-500" /> Welcome Back!{" "}
           </h2>
           <form onSubmit={handleSignin} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1 ">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
                 Email
               </label>
               <input
                 type="email"
-                name="email"
                 ref={emailRef}
+                name="email"
                 placeholder="example@email.com"
-                className="mt-1 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 transition duration-150  text-gray-900 dark:text-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400"
+                className="mt-1 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 transition text-gray-900"
                 required
               />
             </div>
@@ -127,30 +121,31 @@ const Login = () => {
                 type={show ? "text" : "password"}
                 name="password"
                 placeholder="••••••••"
-                className="mt-1 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 transition duration-150  text-gray-900 dark:text-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400"
+                className="mt-1 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 transition text-gray-900"
                 required
               />
               <span
                 onClick={() => setShow(!show)}
-                className="absolute right-3 top-1/2 mt-2 cursor-pointer text-green-600 text-lg"
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-green-600 text-lg"
               >
                 {show ? <IoEyeOff /> : <FaEye />}
               </span>
             </div>
 
             <button
-              className="text-sm font-medium text-green-600 hover:text-green-800 hover:underline cursor-pointer block text-left"
-              onClick={handleForgetPassword}
               type="button"
+              onClick={handleForgetPassword}
+              className="text-sm text-green-600 hover:text-green-800 hover:underline cursor-pointer block text-left pt-1"
             >
               Forgot Password?
             </button>
 
             <button
               type="submit"
-              className="w-full py-3 px-4 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition duration-300 shadow-md"
+              disabled={loading}
+              className="w-full py-3 px-4 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition shadow-md"
             >
-              Sign In
+              {loading ? "Processing..." : "Sign In"}
             </button>
 
             <div className="mt-5 border-t border-gray-200 pt-5">
@@ -161,21 +156,22 @@ const Login = () => {
               </div>
 
               <button
-                onClick={handleGoogleSignin}
                 type="button"
-                className="w-full flex items-center justify-center py-2 px-4 mb-3 border border-gray-300 rounded-lg shadow-sm text-base font-medium text-gray-700 bg-white hover:bg-gray-50 transition duration-150"
+                onClick={handleGoogleSignin}
+                disabled={loading}
+                className="w-full flex items-center justify-center py-2 px-4 mb-3 border border-gray-300 rounded-lg shadow-sm text-base font-medium text-gray-700 bg-white hover:bg-gray-50 transition"
               >
-                <FcGoogle className="mr-3 text-red-500 text-lg" />
+                <FcGoogle className="mr-3 text-lg" />
                 Sign in with Google
               </button>
             </div>
 
             <div className="text-center mt-3">
               <p className="text-sm text-gray-500">
-                Don’t have an account?{" "}
+                Don’t have an account?
                 <Link
                   to="/register"
-                  className="text-green-600 hover:underline font-medium"
+                  className="text-green-600 hover:underline font-medium ml-1"
                 >
                   Register Here
                 </Link>
@@ -183,7 +179,7 @@ const Login = () => {
             </div>
           </form>
         </div>
-      </Container>
+      </div>
     </div>
   );
 };

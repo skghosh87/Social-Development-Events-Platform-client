@@ -11,6 +11,7 @@ import JoinedEvents from "../Pages/JoinedEvents";
 import Login from "../Pages/Login";
 import EventDetails from "../Pages/EventDetails";
 import EditEvent from "../Pages/EditEvent";
+import ProfileUpdate from "../Components/ProfileUpdate";
 
 export const router = createBrowserRouter([
   {
@@ -38,6 +39,14 @@ export const router = createBrowserRouter([
       {
         path: "/register",
         element: <Register />,
+      },
+      {
+        path: "/profile-update",
+        element: (
+          <PrivateRoute>
+            <ProfileUpdate />
+          </PrivateRoute>
+        ),
       },
       {
         path: "/create-event",

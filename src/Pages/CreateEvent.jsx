@@ -1,8 +1,9 @@
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import Container from "../Components/Container";
-import { AuthContext } from "../Context/AuthContext";
+// FIX 1: useContext(AuthContext) এর বদলে কাস্টম useAuth হুক import করা হলো
+import { useAuth } from "../Context/AuthProvider";
 import {
   FaCalendarPlus,
   FaRegCalendarAlt,
@@ -10,10 +11,11 @@ import {
   FaUser,
 } from "react-icons/fa";
 import { toast, ToastContainer } from "react-toastify";
-import axios from "axios"; // <-- নতুন: Axios ইম্পোর্ট করা হলো
+import axios from "axios";
 
 const CreateEvent = () => {
-  const { user } = useContext(AuthContext);
+  // FIX 2: useAuth হুক থেকে user এবং loading ডিস্ট্রাকচার করা হলো
+  const { user, loading } = useAuth();
   const [eventDate, setEventDate] = useState(new Date());
 
   // আপাতত লোকালহোস্ট ব্যবহার করা হলো। সার্ভার সেটআপের পর এটি পরিবর্তন করতে হবে।
@@ -21,8 +23,14 @@ const CreateEvent = () => {
 
   // ফর্ম সাবমিট হ্যান্ডলার (Axios ব্যবহার করে)
   const handleCreateEvent = async (e) => {
-    // async ফাংশন করা হলো
     e.preventDefault();
+
+    // নিরাপত্তা নিশ্চিত করার জন্য ক্লায়েন্ট সাইডেও user চেক
+    if (!user || !user.email) {
+      toast.error("Please log in to create an event.");
+      return;
+    }
+
     const form = e.target;
 
     // ফর্ম ডেটা সংগ্রহ
@@ -35,7 +43,7 @@ const CreateEvent = () => {
       // DatePicker থেকে ISO ফরমেটে ডেট পাঠানো
       eventDate: eventDate.toISOString(),
       organizerName: user?.displayName,
-      organizerEmail: user?.email,
+      organizerEmail: user?.email, // Firebase থেকে নিশ্চিত ইমেইল ব্যবহার
       postedAt: new Date().toISOString(),
       participants: 0,
     };
@@ -65,6 +73,32 @@ const CreateEvent = () => {
       }
     }
   };
+
+  // লোডিং স্টেট চেক
+  if (loading) {
+    return (
+      <div className="text-center py-20">
+        <span className="loading loading-spinner loading-lg"></span>
+      </div>
+    );
+  }
+
+  // অথেন্টিকেশন স্টেট চেক: লগইন না থাকলে ফর্ম হাইড করা
+  if (!user) {
+    return (
+      <Container className="py-20 text-center">
+        <div className="p-10 bg-red-50 border border-red-300 rounded-lg shadow-lg">
+          <h2 className="text-2xl font-bold text-red-700 mb-4">
+            Access Denied
+          </h2>
+          <p className="text-gray-600">
+            You must be logged in to create a new event. Please log in to
+            continue.
+          </p>
+        </div>
+      </Container>
+    );
+  }
 
   return (
     <Container className="py-10">
@@ -178,13 +212,14 @@ const CreateEvent = () => {
           </div>
 
           {/* Organizer Info (Read-Only) */}
+          {/* user object নিশ্চিতভাবে লোড হওয়ার পরই এখানে ডিসপ্লে হবে */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-blue-50 p-4 rounded-lg border border-blue-300">
             <div className="flex items-center gap-2">
               <FaUser className="text-blue-600" />
               <p className="text-sm font-medium text-gray-700">
                 Organizer:{" "}
                 <span className="font-semibold">
-                  {user?.displayName || "Loading..."}
+                  {user?.displayName || "N/A"}
                 </span>
               </p>
             </div>
@@ -192,9 +227,7 @@ const CreateEvent = () => {
               <FaEnvelope className="text-blue-600" />
               <p className="text-sm font-medium text-gray-700">
                 Email:{" "}
-                <span className="font-semibold">
-                  {user?.email || "Loading..."}
-                </span>
+                <span className="font-semibold">{user?.email || "N/A"}</span>
               </p>
             </div>
           </div>

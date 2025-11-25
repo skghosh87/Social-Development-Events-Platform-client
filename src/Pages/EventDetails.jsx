@@ -1,8 +1,9 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { AuthContext } from "../Context/AuthContext";
+// FIX 1: AuthContext এর বদলে useAuth হুক import করা হলো
+import { useAuth } from "../Context/AuthProvider";
 import Container from "../Components/Container";
 import {
   FaCalendarAlt,
@@ -18,7 +19,8 @@ const SERVER_BASE_URL = "http://localhost:5000";
 const EventDetails = () => {
   // 1. স্টেট এবং হুক ব্যবহার
   const { id } = useParams(); // URL থেকে ইভেন্ট ID নেওয়া
-  const { user, loading: authLoading } = useContext(AuthContext); // AuthContext থেকে ইউজার ডেটা নেওয়া
+  // FIX 2: useAuth থেকে user এবং authLoading নেওয়া হলো
+  const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
 
   const [event, setEvent] = useState(null);
@@ -28,6 +30,9 @@ const EventDetails = () => {
 
   // 2. ইভেন্ট এবং জয়েন স্ট্যাটাস ফেচ করা
   useEffect(() => {
+    // প্রমাণীকরণ লোড না হওয়া পর্যন্ত অপেক্ষা করুন
+    if (authLoading) return;
+
     const fetchEventDetails = async () => {
       setLoading(true);
       try {
@@ -40,27 +45,30 @@ const EventDetails = () => {
         setLoading(false);
         return;
       }
+      // ডেটা ফেচ হওয়ার পর ইনিশিয়াল লোডিং বন্ধ করা হচ্ছে
       setLoading(false);
     };
 
     const checkJoinStatus = async () => {
+      // ইভেন্ট ডেটা এবং ইউজার ইমেল না থাকলে চেক করার দরকার নেই
       if (!user?.email || !id) return;
+
       try {
         // ইউজার এই ইভেন্টে জয়েন করেছে কিনা, তা চেক করা
-        // (দ্রষ্টব্য: এই রুটের জন্য ব্যাকএন্ডে একটি নতুন API তৈরি করতে হতে পারে যদি শুধু জয়েন স্ট্যাটাস চেক করতে হয়।
-        // সহজতার জন্য, আমরা JoinedEvents API ব্যবহার করব, কিন্তু একটি অপ্টিমাইজড রুট দরকার)
-
-        // অস্থায়ীভাবে, আমরা /api/joined-events/:email রুট ব্যবহার করে স্ট্যাটাস চেক করছি:
+        // (নোট: এটি একটি অস্থায়ী রুট। অপ্টিমাইজেশনের জন্য একটি নির্দিষ্ট চেক রুট ব্যবহার করা উচিত।)
         const response = await axios.get(
           `${SERVER_BASE_URL}/api/joined-events/${user.email}`
         );
         const joinedEvents = response.data;
+
+        // ইভেন্ট আইডি বা MongoDB ID দিয়ে চেক করা
         const alreadyJoined = joinedEvents.some(
           (e) => e.event_id === id || e._id === id
         );
         setIsJoined(alreadyJoined);
       } catch (error) {
         console.error("Error checking join status:", error);
+        // ত্রুটি হলেও isJoined মিথ্যা থাকবে
       }
     };
 
@@ -69,7 +77,7 @@ const EventDetails = () => {
     if (user?.email) {
       checkJoinStatus();
     }
-  }, [id, user]);
+  }, [id, user, authLoading, navigate]); // dependency array update করা হয়েছে
 
   // 3. ইভেন্টে জয়েন করার ফাংশন
   const handleJoinEvent = async () => {
@@ -103,6 +111,7 @@ const EventDetails = () => {
         // ইভেন্ট ডেটা ম্যানুয়ালি আপডেট করা
         setEvent((prevEvent) => ({
           ...prevEvent,
+          // participants ফিল্ডটি না থাকলে 0 ধরে নিয়ে 1 যোগ করা
           participants: (prevEvent.participants || 0) + 1,
         }));
       } else {
@@ -122,7 +131,11 @@ const EventDetails = () => {
     return (
       <Container className="py-20 text-center">
         <FaSpinner className="text-5xl text-blue-500 animate-spin mx-auto" />
-        <p className="mt-4 text-gray-600">ইভেন্টের বিবরণ লোড হচ্ছে...</p>
+        <p className="mt-4 text-gray-600">
+          {authLoading
+            ? "প্রমাণীকরণ লোড হচ্ছে..."
+            : "ইভেন্টের বিবরণ লোড হচ্ছে..."}
+        </p>
       </Container>
     );
   }
@@ -199,11 +212,9 @@ const EventDetails = () => {
           </h3>
           <div className="text-gray-600 space-y-1">
             <p>
-              <strong>নাম:</strong> {event.organizerName}
-            </p>
-            <p>
               <strong>ইমেল:</strong> {event.organizerEmail}
             </p>
+            {/* organizerName নাও থাকতে পারে, তাই শুধু ইমেল দেখানো হলো */}
           </div>
 
           {/* Join Button */}

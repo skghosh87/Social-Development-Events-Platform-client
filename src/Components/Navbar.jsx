@@ -1,22 +1,23 @@
 import { Link, useNavigate } from "react-router-dom";
 import logo from "/Logo.png";
 
-import MyLink from "./MyLink";
-import Container from "./Container";
 import { toast } from "react-toastify";
-import { useContext, useEffect, useState } from "react";
-import { AuthContext } from "../Context/AuthContext";
+import { useEffect, useState } from "react";
+
+import { useAuth } from "../Context/AuthProvider";
+import Container from "./Container";
 
 const DEFAULT_AVATAR = "/default-user.png";
 
 const Navbar = () => {
   const navigate = useNavigate();
 
-  const { user, signoutUserFunc, loading } = useContext(AuthContext);
+  const { user, logOut, loading } = useAuth();
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
 
   useEffect(() => {
     const html = document.querySelector("html");
+    // Assuming Tailwind/DaisyUI theme implementation using data-theme
     html.setAttribute("data-theme", theme);
     localStorage.setItem("theme", theme);
   }, [theme]);
@@ -26,7 +27,8 @@ const Navbar = () => {
   };
 
   const handleSignout = () => {
-    signoutUserFunc()
+    // FIX 4: logOut ফাংশনটি ব্যবহার করা হলো
+    logOut()
       .then(() => {
         toast.success("Signout successful");
         navigate("/login");
@@ -35,6 +37,18 @@ const Navbar = () => {
         toast.error(e.message);
       });
   };
+
+  // Loading State Handling: If loading, show a skeleton/spinner
+  if (loading) {
+    return (
+      <div className="bg-green-600 py-2 shadow-md sticky top-0 z-40">
+        <Container className="flex items-center justify-between h-[55px]">
+          {/* A simple loading placeholder */}
+          <div className="w-full bg-green-500 rounded-lg animate-pulse h-8"></div>
+        </Container>
+      </div>
+    );
+  }
 
   const ProfileDropdown = (
     <div className="dropdown dropdown-end relative z-50">
@@ -60,7 +74,6 @@ const Navbar = () => {
           {user?.displayName || "User Profile"}
         </li>
         <li className="mt-1">
-          {" "}
           <Link
             to={"/profile-update"}
             className="hover:bg-base-100 font-semibold"
@@ -87,7 +100,7 @@ const Navbar = () => {
         <li className="mt-2 border-t pt-2">
           <button
             onClick={handleSignout}
-            className="btn btn-error btn-sm  text-white font-semibold hover:bg-red-50 hover:text-red-600 w-full text-center"
+            className="btn btn-error btn-sm  text-white font-semibold hover:bg-red-50 hover:text-red-600 w-full text-center"
           >
             Logout
           </button>
@@ -137,17 +150,29 @@ const Navbar = () => {
 
         <ul className="hidden md:flex items-center gap-4 text-white font-medium">
           <li>
-            <MyLink to={"/"}>Home</MyLink>
+            {/* Assuming MyLink was a wrapper around Link/NavLink */}
+            <Link
+              to={"/"}
+              className="hover:text-yellow-400 transition duration-150"
+            >
+              Home
+            </Link>
           </li>
           <li>
-            <MyLink to={"/upcoming-events"}>Upcoming Events</MyLink>
+            <Link
+              to={"/upcoming-events"}
+              className="hover:text-yellow-400 transition duration-150"
+            >
+              Upcoming Events
+            </Link>
           </li>
         </ul>
 
         <div className="flex items-center gap-3">
           {ThemeToggle}
 
-          {!loading && (user ? ProfileDropdown : SignInButton)}
+          {/* loading check is now handled at the top, only check for user */}
+          {user ? ProfileDropdown : SignInButton}
         </div>
       </Container>
     </div>

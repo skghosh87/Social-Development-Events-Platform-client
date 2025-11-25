@@ -1,17 +1,32 @@
-import React, { useState, useContext } from "react";
+import React, { useState } from "react";
 import { FaEye, FaGoogle, FaUserPlus } from "react-icons/fa";
 import { IoEyeOff } from "react-icons/io5";
-import { Link, useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { useAuth } from "../Context/AuthProvider";
 import Container from "../Components/Container";
-import { toast } from "react-toastify";
-import { AuthContext } from "../Context/AuthContext";
 
 const Register = () => {
-  const { createUser, updateUser, signInWithEmailFunc } =
-    useContext(AuthContext);
+  const { createUser, updateUserProfile, signInWithGoogle, setLoading } =
+    useAuth();
+
   const [show, setShow] = useState(false);
   const [passwordError, setPasswordError] = useState("");
   const navigate = useNavigate();
+
+  const parseFirebaseError = (error) => {
+    let errorMessage = error.message
+      .replace("Firebase: Error (auth/", "")
+      .replace(").", "")
+      .replaceAll("-", " ")
+      .trim();
+
+    if (errorMessage.includes("email already in use")) {
+      errorMessage = "This email is already registered. Please sign in.";
+    }
+    return errorMessage;
+  };
 
   const handleSignup = async (e) => {
     e.preventDefault();
@@ -21,6 +36,7 @@ const Register = () => {
       form.get("photo") || "https://i.ibb.co/5vFwYxS/default-user.png";
     const email = form.get("email");
     const password = form.get("password");
+
     setPasswordError("");
 
     const validationMessage =
@@ -34,46 +50,35 @@ const Register = () => {
     }
 
     try {
+      setLoading(true);
       await createUser(email, password);
-      await updateUser(name, photoURL);
+      await updateUserProfile(name, photoURL);
 
-      toast.success(
-        "Registration Successful! Welcome to Social Development Events ",
-        {
-          position: "top-center",
-        }
-      );
+      toast.success("Registration Successful! Welcome to SDEP", {
+        position: "top-center",
+      });
       navigate("/");
     } catch (error) {
       const errorMessage = parseFirebaseError(error);
       toast.error(errorMessage, { position: "top-center" });
+    } finally {
+      setLoading(false);
     }
-  };
-
-  const parseFirebaseError = (error) => {
-    let errorMessage = error.message
-      .replace("Firebase: Error (auth/", "")
-      .replace(").", "")
-      .replaceAll("-", " ");
-
-    if (errorMessage.includes("email already in use")) {
-      errorMessage = "This email is already registered. Please sign in.";
-    }
-    return errorMessage;
   };
 
   const handleGoogleSignup = async () => {
     try {
-      await signInWithEmailFunc();
-      toast.success("Google Sign-Up Successful! ", {
-        position: "top-center",
-      });
+      setLoading(true);
+      await signInWithGoogle();
+      toast.success("Google Sign-Up Successful!", { position: "top-center" });
       navigate("/");
     } catch (error) {
       const errorMessage = parseFirebaseError(error);
       toast.error(`Google sign-up failed: ${errorMessage}`, {
         position: "top-center",
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -82,61 +87,79 @@ const Register = () => {
       <Container className="flex items-center justify-center">
         <div className="w-full max-w-lg bg-white p-8 rounded-xl shadow-2xl border border-green-200">
           <h2 className="text-3xl font-bold text-center text-green-700 mb-6 flex items-center justify-center gap-2">
-            <FaUserPlus className="text-green-500" /> Create Your Account
+            <FaUserPlus className="text-green-500 text-3xl" /> Create Your
+            Account
           </h2>
+
           <form onSubmit={handleSignup} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-base-100 mb-1">
+              <label
+                htmlFor="name"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Full Name
               </label>
               <input
+                id="name"
                 type="text"
                 name="name"
-                placeholder="Please Input Your Name"
-                className="mt-1 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 transition duration-150 text-gray-900 dark:text-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400"
+                placeholder="Your Name"
+                className="mt-1 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 transition duration-150"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="photo"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Photo URL (Optional)
               </label>
               <input
+                id="photo"
                 type="text"
                 name="photo"
-                placeholder="Your photo URL here"
-                className="mt-1 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 transition duration-150 text-gray-900 dark:text-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400"
+                placeholder="Your photo URL"
+                className="mt-1 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 transition duration-150"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Email
               </label>
               <input
+                id="email"
                 type="email"
                 name="email"
                 placeholder="example@email.com"
-                className="mt-1 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 transition duration-150 text-gray-900 dark:text-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400"
+                className="mt-1 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 transition duration-150"
                 required
               />
             </div>
 
             <div className="relative">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Password
               </label>
               <input
+                id="password"
                 type={show ? "text" : "password"}
                 name="password"
                 placeholder="••••••••"
-                className="mt-1 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 transition duration-150 text-gray-900 dark:text-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400"
+                className="mt-1 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 transition duration-150"
                 required
               />
               <span
                 onClick={() => setShow(!show)}
-                className="absolute right-3 top-1/2 mt-2 cursor-pointer text-green-600 text-lg"
+                className="absolute right-3 top-1/2 mt-2 cursor-pointer text-green-600 text-xl"
               >
                 {show ? <IoEyeOff /> : <FaEye />}
               </span>
@@ -166,7 +189,7 @@ const Register = () => {
                 type="button"
                 className="w-full flex items-center justify-center py-2 px-4 border border-gray-300 rounded-lg shadow-sm text-base font-medium text-gray-700 bg-white hover:bg-gray-50 transition duration-150"
               >
-                <FaGoogle className="mr-3 text-red-500 text-lg" />
+                <FaGoogle className="mr-3 text-red-500 text-xl" />
                 Sign up with Google
               </button>
             </div>
@@ -176,7 +199,7 @@ const Register = () => {
                 Already have an account?
                 <Link
                   to="/login"
-                  className="text-green-600 hover:underline font-medium"
+                  className="text-green-600 hover:underline font-medium ml-1"
                 >
                   Login Here
                 </Link>
@@ -185,6 +208,7 @@ const Register = () => {
           </form>
         </div>
       </Container>
+      <ToastContainer />
     </div>
   );
 };

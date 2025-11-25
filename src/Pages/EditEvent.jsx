@@ -1,9 +1,10 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import Container from "../Components/Container";
-import { AuthContext } from "../Context/AuthContext";
+// FIX 1: AuthContext এর বদলে useAuth হুক import করা হলো
+import { useAuth } from "../Context/AuthProvider";
 import { FaEdit, FaSpinner, FaSave } from "react-icons/fa";
 
 const SERVER_BASE_URL = "http://localhost:5000";
@@ -11,9 +12,11 @@ const SERVER_BASE_URL = "http://localhost:5000";
 const EditEvent = () => {
   // 1. হুকস এবং স্টেটস
   const { id } = useParams(); // URL থেকে ইভেন্ট ID নেওয়া
-  const { user } = useContext(AuthContext); // AuthContext থেকে ইউজার ডেটা নেওয়া
+  // FIX 2: useAuth থেকে user এবং authLoading নেওয়া হলো
+  const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
 
+  // internal loading state for data fetching and submission
   const [loading, setLoading] = useState(true);
   const [eventData, setEventData] = useState({
     eventName: "",
@@ -22,18 +25,20 @@ const EditEvent = () => {
     location: "",
     description: "",
     image: "",
-    // organizerName এবং organizerEmail AuthContext থেকে নেওয়া হবে বা ডেটাবেস থেকে লোড হবে
   });
 
   // 2. বর্তমান ইভেন্ট ডেটা ফেচ করা
   useEffect(() => {
-    const fetchEvent = async () => {
-      if (!user?.email) {
-        toast.warn("অনুগ্রহ করে লগইন করুন।");
-        navigate("/login");
-        return;
-      }
+    // authLoading শেষ না হওয়া পর্যন্ত অপেক্ষা করুন
+    if (authLoading) return;
 
+    if (!user?.email) {
+      toast.warn("অনুগ্রহ করে লগইন করুন।");
+      navigate("/login");
+      return;
+    }
+
+    const fetchEvent = async () => {
       try {
         setLoading(true);
         // ইভেন্ট ID ব্যবহার করে ইভেন্টের বিবরণ ফেচ করা
@@ -61,7 +66,7 @@ const EditEvent = () => {
     };
 
     fetchEvent();
-  }, [id, user, navigate]);
+  }, [id, user, authLoading, navigate]); // dependency array update করা হয়েছে
 
   // 3. ইনপুট হ্যান্ডলিং
   const handleChange = (e) => {
@@ -76,13 +81,15 @@ const EditEvent = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (loading) return;
+    // authLoading অথবা data fetching loading থাকলে সাবমিট আটকানো
+    if (authLoading || loading) return;
 
     setLoading(true);
     const updatedData = {
       ...eventData,
+      // নিশ্চিত করা organizerEmail ব্যবহার করা
       organizerEmail: user.email,
-      // এখানে অন্য কোনো চেক বা ডেটা মডিফিকেশন লাগলে করা যেতে পারে
+      updatedAt: new Date().toISOString(), // আপডেটের সময় ট্র্যাক করা
     };
 
     try {
@@ -109,11 +116,29 @@ const EditEvent = () => {
   };
 
   // 5. রেন্ডারিং
-  if (loading) {
+  if (authLoading || loading) {
     return (
       <Container className="py-20 text-center">
         <FaSpinner className="text-5xl text-blue-500 animate-spin mx-auto" />
-        <p className="mt-4 text-gray-600">ইভেন্ট ডেটা লোড হচ্ছে...</p>
+        <p className="mt-4 text-gray-600">
+          {authLoading ? "প্রমাণীকরণ লোড হচ্ছে..." : "ইভেন্ট ডেটা লোড হচ্ছে..."}
+        </p>
+      </Container>
+    );
+  }
+
+  // লগইন না করা ইউজারদের জন্য অতিরিক্ত চেক (যদিও useEffect রিডাইরেক্ট করবে)
+  if (!user) {
+    return (
+      <Container className="py-20 text-center">
+        <div className="p-10 bg-red-50 border border-red-300 rounded-lg shadow-lg">
+          <h2 className="text-2xl font-bold text-red-700 mb-4">
+            অ্যাক্সেস অনুমোদিত নয়
+          </h2>
+          <p className="text-gray-600">
+            এই ইভেন্টটি আপডেট করার জন্য আপনাকে অবশ্যই লগইন করতে হবে।
+          </p>
+        </div>
       </Container>
     );
   }
@@ -202,6 +227,7 @@ const EditEvent = () => {
               type="datetime-local"
               name="eventDate"
               id="eventDate"
+              // `datetime-local` ইনপুট সঠিকভাবে পরিচালনার জন্য format আগেই করা হয়েছে
               value={eventData.eventDate}
               onChange={handleChange}
               required
